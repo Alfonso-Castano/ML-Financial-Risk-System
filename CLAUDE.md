@@ -59,6 +59,90 @@ When you hit an error:
 **4. Keep workflows current**
 Workflows should evolve as you learn. When you find better methods, discover constraints, or encounter recurring issues, update the workflow. That said, don't create or overwrite workflows without asking unless I explicitly tell you to. These are your instructions and need to be preserved and refined, not tossed after one use.
 
+## Complexity Guardrails (Critical)
+
+**This is a learning project, not a production system.** The goal is for the user to learn how to integrate ML models into applications with Claude's help. Keep it simple and beginner-friendly.
+
+**Before introducing ANY new layer, abstraction, tool, or file, verify:**
+1. Does this directly help understand ML system design?
+2. Is this required for v1 to work?
+3. Does this add infrastructure without educational value?
+4. Can this be done in an existing file instead?
+5. Am I over-engineering for imaginary future requirements?
+
+**If any answer suggests unnecessary complexity → DO NOT ADD IT.**
+
+### Prohibited Additions
+
+**Never introduce unless explicitly instructed:**
+- Service layer abstractions (services/, inference_service.py, training_service.py)
+- Databases (SQLite, PostgreSQL, any ORM)
+- Frontend frameworks (React, Vue, Svelte, Angular)
+- docker-compose or multi-container setups
+- Model registries or versioning systems
+- Enterprise logging/monitoring/observability stacks
+- Multi-environment configuration systems
+- Requirement ID bureaucracy (REQ-001, REQ-002, etc.)
+- Large research documentation directories
+- API gateways, load balancers, reverse proxies
+- Message queues, caching layers, CDNs
+- Authentication/authorization systems (unless explicitly required)
+- Recommendation engines (unless core feature)
+
+### Locked Architecture (Do Not Modify)
+
+**Stress Definition:**
+- Savings < 1 month expenses, OR
+- 3+ consecutive months negative cash flow
+
+**Model Architecture:**
+- Input → 128 neurons (ReLU + Dropout) → 64 neurons (ReLU + Dropout) → Output (Sigmoid)
+
+**Directory Structure:**
+```
+backend/
+├── main.py
+├── api/ (routes.py, schemas.py)
+├── ml/ (model.py, predictor.py, train.py, evaluate.py, dataset.py)
+├── data/ (synthetic_generator.py, feature_engineering.py, preprocessing.py)
+└── config/ (settings.py)
+
+frontend/
+├── index.html
+├── app.js
+└── styles.css
+
+models/
+├── latest_model.pth
+└── metrics.json
+
+.planning/ (minimal)
+├── PROJECT.md
+├── ROADMAP.md
+├── STATE.md
+└── REQUIREMENTS.md
+
+Dockerfile (single container)
+```
+
+**No:**
+- service/ directory
+- database/ directory
+- docker-compose.yml
+- .planning/research/
+- .planning/config.json
+
+### Architectural Drift Check (Mandatory Before Each Phase)
+
+Before starting any phase execution:
+
+1. **Restate current architecture** - Confirm the 6 layers (Frontend → API → ml/predictor.py → Features → Model → Files)
+2. **Verify no new layers being introduced** - Check you're not adding services/, db/, etc.
+3. **Confirm scope compliance** - Are you keeping it simple and beginner-friendly?
+4. **Ask if uncertain** - If you're about to add something that feels complex, ask first
+
+**Remember:** Orchestration lives in `ml/predictor.py`. API routes are thin. No database. Vanilla JS frontend. Single Dockerfile.
+
 ## The Self-Improvement Loop
 
 Every failure is a chance to make the system stronger:
