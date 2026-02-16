@@ -28,6 +28,11 @@ Each phase is atomic and demonstrates a key integration point.
 - Apply stress labeling
 - Save dataset
 
+**Plans:** 1 plan
+
+Plans:
+- [ ] 01-01-PLAN.md --- Project structure, configuration, and synthetic data generator
+
 ---
 
 ## Phase 2: ML Model & Training Pipeline
