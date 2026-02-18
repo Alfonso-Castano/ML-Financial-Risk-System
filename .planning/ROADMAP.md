@@ -43,16 +43,18 @@ Plans:
 - backend/ml/model.py (MLP: input → 128 → 64 → output)
 - backend/ml/dataset.py (PyTorch Dataset/DataLoader)
 - backend/ml/train.py (training loop)
-- backend/ml/evaluate.py (metrics computation)
+- backend/ml/evaluate.py (metrics computation + training visualization)
 - backend/data/feature_engineering.py (debt ratio, liquidity, cash flow features)
 - models/latest_model.pth (trained model checkpoint)
 - models/metrics.json (evaluation results)
+- models/loss_curves.png, models/confusion_matrix.png, models/roc_curve.png (training plots)
 
 **Success Criteria:**
 - [ ] Model trains without errors
 - [ ] Validation loss decreases
 - [ ] Test recall > 0.7 (catching at-risk users)
 - [ ] Metrics saved to JSON
+- [ ] Training plots saved to models/ (loss curves, confusion matrix, ROC curve)
 
 **Requirements Covered:**
 - Define MLP architecture
@@ -61,6 +63,7 @@ Plans:
 - Compute features (pure functions)
 - Evaluate with recall priority
 - Save model and metrics
+- Visualize training progress with Matplotlib
 
 ---
 

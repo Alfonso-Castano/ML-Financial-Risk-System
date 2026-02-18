@@ -20,6 +20,7 @@
 - [ ] Evaluate with metrics: Recall, F1, Precision, Accuracy, ROC-AUC
 - [ ] Save trained model to models/latest_model.pth
 - [ ] Save metrics to models/metrics.json
+- [ ] Save training visualizations: loss curves, confusion matrix, ROC curve (Matplotlib)
 
 ### API
 - [ ] FastAPI endpoint: POST /predict (accepts financial data, returns risk assessment)
