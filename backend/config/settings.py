@@ -59,3 +59,23 @@ ARCHETYPES = {
 
 # Output path
 OUTPUT_PATH = "data/synthetic_train.csv"
+
+# Training hyperparameters
+NUM_EPOCHS = 75
+BATCH_SIZE = 64
+LEARNING_RATE = 0.001
+DROPOUT_RATE = 0.3
+EARLY_STOPPING_PATIENCE = 10
+
+# Data split ratios (by profile, not by row)
+TEST_SIZE = 0.15
+VAL_SIZE = 0.176  # 0.15 / 0.85 to get 15% of total as validation
+
+# Model paths
+MODEL_PATH = "models/latest_model.pth"
+METRICS_PATH = "models/metrics.json"
+SCALER_PATH = "models/scaler_stats.json"
+DATA_PATH = "data/synthetic_train.csv"
+
+# Model architecture
+INPUT_SIZE = 9  # Number of engineered features
