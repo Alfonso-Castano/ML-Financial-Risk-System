@@ -2,16 +2,16 @@
 
 ## Current Status
 
-**Phase**: 01 - Foundation & Synthetic Data
-**Current Plan**: 2 of 1 (Phase complete)
-**Last Updated**: 2026-02-17
+**Phase**: 02 - ML Model & Training
+**Current Plan**: 3 of 4 (Plan 02-02 complete)
+**Last Updated**: 2026-02-23
 
 ## Progress
 
 | Phase | Status | Progress |
 |-------|--------|----------|
 | 1: Foundation & Synthetic Data | ✓ Complete | 100% (1/1 plans) |
-| 2: ML Model & Training | ○ Pending | 0% |
+| 2: ML Model & Training | ◆ In Progress | 25% (1/4 plans complete) |
 | 3: API Layer & Orchestration | ○ Pending | 0% |
 | 4: Frontend Dashboard | ○ Pending | 0% |
 | 5: Deployment & Documentation | ○ Pending | 0% |
@@ -21,7 +21,7 @@
 ## Project Context
 
 **Core Value**: Learn how to integrate ML models into applications with clean architecture
-**Current Focus**: Phase 1 complete - Ready for Phase 2 (ML Model & Training)
+**Current Focus**: Phase 2 in progress - 02-02 (model + dataset) complete, ready for 02-03 (training loop)
 
 See `.planning/PROJECT.md` for full architecture and constraints.
 
@@ -30,9 +30,13 @@ See `.planning/PROJECT.md` for full architecture and constraints.
 | Phase | Plan | Duration | Tasks | Files | Completed |
 |-------|------|----------|-------|-------|-----------|
 | 01 | 01 | 3min 22sec | 2 | 12 | 2026-02-17 |
+| 02 | 02 | 4min | 1 | 2 | 2026-02-23 |
 
 ## Recent Decisions
 
+- 2026-02-23: Named layer attributes (fc1, relu1, dropout1...) over nn.Sequential for educational clarity
+- 2026-02-23: Scaling is external to FinancialDataset - StandardScaler fits in train.py to prevent data leakage
+- 2026-02-23: input_size parameterized (default=9) so model is not hard-coded to feature count
 - 2026-02-17: Used 4 financial archetypes (struggling, getting_by, stable, comfortable) matching user's salary bands
 - 2026-02-17: Calibrated archetype parameters iteratively to achieve 36.2% stress ratio (target: ~35%)
 - 2026-02-17: Applied long format (one row per person-month) for time series compatibility
@@ -43,22 +47,21 @@ See `.planning/PROJECT.md` for full architecture and constraints.
 
 ## Next Action
 
-**Start Phase 2**: ML Model & Training
+**Continue Phase 2**: Execute 02-03 (training loop)
 
 **Ready to proceed:**
-- Training dataset available at data/synthetic_train.csv
-- 36,000 labeled samples with realistic financial patterns
-- Stress labeling verified correct per two-condition rule
-- All columns present for feature engineering
+- FinancialRiskModel available at backend/ml/model.py (9->128->64->1 MLP)
+- FinancialDataset available at backend/ml/dataset.py (numpy -> float32 tensors)
+- Training dataset at data/synthetic_train.csv (36,000 labeled samples)
 
-**Command**: Execute Phase 2 plans with GSD workflow
+**Command**: Execute Phase 2 plan 02-03 with GSD workflow
 
 ## Last Session
 
-**Session timestamp:** 2026-02-17T04:46:16Z
-**Stopped at:** Completed 01-foundation-synthetic-data/01-01-PLAN.md
-**Status:** Phase 1 complete
+**Session timestamp:** 2026-02-23T07:36:00Z
+**Stopped at:** Completed 02-ml-model-training-pipeline/02-02-PLAN.md
+**Status:** Plan 02-02 complete - model and dataset classes implemented
 
 ---
 
-*Updated: 2026-02-17 after Phase 1 completion*
+*Updated: 2026-02-23 after Phase 2 Plan 02 completion*
