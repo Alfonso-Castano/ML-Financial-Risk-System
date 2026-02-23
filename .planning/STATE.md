@@ -3,7 +3,7 @@
 ## Current Status
 
 **Phase**: 02 - ML Model & Training
-**Current Plan**: 4 of 4 (Plan 02-03 complete)
+**Current Plan**: Phase 2 complete (4/4 plans done)
 **Last Updated**: 2026-02-23
 
 ## Progress
@@ -11,7 +11,7 @@
 | Phase | Status | Progress |
 |-------|--------|----------|
 | 1: Foundation & Synthetic Data | ✓ Complete | 100% (1/1 plans) |
-| 2: ML Model & Training | ◆ In Progress | 75% (3/4 plans complete) |
+| 2: ML Model & Training | ✓ Complete | 100% (4/4 plans complete) |
 | 3: API Layer & Orchestration | ○ Pending | 0% |
 | 4: Frontend Dashboard | ○ Pending | 0% |
 | 5: Deployment & Documentation | ○ Pending | 0% |
@@ -21,7 +21,7 @@
 ## Project Context
 
 **Core Value**: Learn how to integrate ML models into applications with clean architecture
-**Current Focus**: Phase 2 in progress - 02-03 (training loop) complete, ready for 02-04 (evaluate.py)
+**Current Focus**: Phase 2 complete - all ML artifacts ready. Begin Phase 3 (API layer).
 
 See `.planning/PROJECT.md` for full architecture and constraints.
 
@@ -33,9 +33,14 @@ See `.planning/PROJECT.md` for full architecture and constraints.
 | 02 | 01 | 1min | 1 | 1 | 2026-02-23 |
 | 02 | 02 | 4min | 1 | 2 | 2026-02-23 |
 | 02 | 03 | 2min | 2 | 4 | 2026-02-23 |
+| 02 | 04 | 5min | 2 | 5 | 2026-02-23 |
 
 ## Recent Decisions
 
+- 2026-02-23: evaluate.py runs standalone (python -m backend.ml.evaluate), not called by train.py - architectural isolation decision
+- 2026-02-23: matplotlib.use('Agg') placed before pyplot import for headless rendering on all platforms
+- 2026-02-23: All sklearn metrics wrapped with float() to prevent numpy scalar JSON serialization errors
+- 2026-02-23: Test set reconstructed deterministically in evaluate.py using same seed/ratios as train.py
 - 2026-02-23: squeeze(-1) used instead of squeeze() to handle single-sample last-batch shape mismatch in BCELoss
 - 2026-02-23: training_history.json saved at end of __main__ so evaluate.py can generate loss plots independently
 - 2026-02-23: num_workers=0 in DataLoaders for Windows compatibility with PyTorch multiprocessing
@@ -54,22 +59,27 @@ See `.planning/PROJECT.md` for full architecture and constraints.
 
 ## Next Action
 
-**Continue Phase 2**: Execute 02-04 (evaluate.py - metrics, confusion matrix, loss curves)
+**Begin Phase 3**: API Layer & Orchestration
 
-**Ready to proceed:**
-- Trained model at models/latest_model.pth (62 epochs, best val loss 0.0329)
-- Scaler stats at models/scaler_stats.json (9 features, mean/scale arrays)
-- Training history at models/training_history.json (train/val loss arrays for loss curve plots)
-- Test split available via train.py main() return value
+**Phase 2 artifacts ready for Phase 3:**
+- `models/latest_model.pth` - trained model weights (62 epochs, recall=0.9448)
+- `models/scaler_stats.json` - feature scaling statistics (mean/scale for 9 features)
+- `models/metrics.json` - evaluation results (recall=0.9448, ROC-AUC=0.9983)
+- `backend/ml/model.py` - FinancialRiskModel class
+- `backend/ml/evaluate.py` - compute_metrics, run_evaluation (reusable in predictor)
+- `backend/data/feature_engineering.py` - build_feature_matrix, FEATURE_NAMES
 
-**Command**: Execute Phase 2 plan 02-04 with GSD workflow
+**Architecture for Phase 3:**
+- `backend/api/routes.py` - thin API routes (FastAPI)
+- `backend/api/schemas.py` - Pydantic request/response models
+- `backend/ml/predictor.py` - orchestration: load model, scale input, predict
 
 ## Last Session
 
-**Session timestamp:** 2026-02-23T07:37:37Z
-**Stopped at:** Completed 02-ml-model-training-pipeline/02-03-PLAN.md
-**Status:** Plan 02-03 complete - training pipeline implemented and model trained
+**Session timestamp:** 2026-02-23T07:41:26Z
+**Stopped at:** Completed 02-ml-model-training-pipeline/02-04-PLAN.md
+**Status:** Phase 2 fully complete - evaluate.py built, recall=0.9448, all plots generated
 
 ---
 
-*Updated: 2026-02-23 after Phase 2 Plan 03 completion*
+*Updated: 2026-02-23 after Phase 2 Plan 04 completion*
