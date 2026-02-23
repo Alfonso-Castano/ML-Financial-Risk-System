@@ -36,8 +36,9 @@ Plans:
 
 ---
 
-## Phase 2: ML Model & Training Pipeline
+## Phase 2: ML Model & Training Pipeline ✓
 
+**Status:** Complete (2026-02-23)
 **Goal**: Build PyTorch model and train it on synthetic data.
 
 **Deliverables:**
@@ -51,11 +52,11 @@ Plans:
 - models/loss_curves.png, models/confusion_matrix.png, models/roc_curve.png (training plots)
 
 **Success Criteria:**
-- [ ] Model trains without errors
-- [ ] Validation loss decreases
-- [ ] Test recall > 0.7 (catching at-risk users)
-- [ ] Metrics saved to JSON
-- [ ] Training plots saved to models/ (loss curves, confusion matrix, ROC curve)
+- [x] Model trains without errors
+- [x] Validation loss decreases
+- [x] Test recall > 0.7 (catching at-risk users) — achieved 0.9448
+- [x] Metrics saved to JSON
+- [x] Training plots saved to models/ (loss curves, confusion matrix, ROC curve)
 
 **Requirements Covered:**
 - Define MLP architecture
@@ -143,7 +144,7 @@ Plans:
 | Phase | Focus | Key Deliverable |
 |-------|-------|-----------------|
 | 1 | Data | synthetic_train.csv ✓ |
-| 2 | Model | latest_model.pth |
+| 2 | Model | latest_model.pth ✓ |
 | 3 | API | POST /predict |
 | 4 | Frontend | index.html dashboard |
 | 5 | Deploy | Dockerfile |
