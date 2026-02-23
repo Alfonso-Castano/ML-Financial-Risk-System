@@ -30,10 +30,13 @@ See `.planning/PROJECT.md` for full architecture and constraints.
 | Phase | Plan | Duration | Tasks | Files | Completed |
 |-------|------|----------|-------|-------|-----------|
 | 01 | 01 | 3min 22sec | 2 | 12 | 2026-02-17 |
+| 02 | 01 | 1min | 1 | 1 | 2026-02-23 |
 | 02 | 02 | 4min | 1 | 2 | 2026-02-23 |
 
 ## Recent Decisions
 
+- 2026-02-23: Feature set locked to 9: avg_income, avg_expenses, final_savings, debt_payment, credit_score, debt_ratio, liquidity_ratio, net_cash_flow, consec_negative_months
+- 2026-02-23: debt_ratio denominator is free cash flow (income - expenses), not gross income
 - 2026-02-23: Named layer attributes (fc1, relu1, dropout1...) over nn.Sequential for educational clarity
 - 2026-02-23: Scaling is external to FinancialDataset - StandardScaler fits in train.py to prevent data leakage
 - 2026-02-23: input_size parameterized (default=9) so model is not hard-coded to feature count
