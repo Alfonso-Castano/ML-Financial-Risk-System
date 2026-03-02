@@ -4,3 +4,5 @@ torch>=2.0
 scikit-learn>=1.0
 matplotlib>=3.0
 tqdm>=4.0
+fastapi>=0.100
+uvicorn>=0.20
