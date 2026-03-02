@@ -3,7 +3,7 @@
 ## Current Status
 
 **Phase**: 03 - API Layer & Orchestration
-**Current Plan**: Plan 01 complete (1/3 plans done)
+**Current Plan**: Phase 3 complete (2/2 plans done)
 **Last Updated**: 2026-03-02
 
 ## Progress
@@ -12,7 +12,7 @@
 |-------|--------|----------|
 | 1: Foundation & Synthetic Data | ✓ Complete | 100% (1/1 plans) |
 | 2: ML Model & Training | ✓ Complete | 100% (4/4 plans complete) |
-| 3: API Layer & Orchestration | ◆ In Progress | 33% (1/3 plans complete) |
+| 3: API Layer & Orchestration | ✓ Complete | 100% (2/2 plans complete) |
 | 4: Frontend Dashboard | ○ Pending | 0% |
 | 5: Deployment & Documentation | ○ Pending | 0% |
 
@@ -21,7 +21,7 @@
 ## Project Context
 
 **Core Value**: Learn how to integrate ML models into applications with clean architecture
-**Current Focus**: Phase 3 Plan 01 complete — schemas and predictor built. Next: Plan 02 (FastAPI app + routes).
+**Current Focus**: Phase 3 complete - API fully functional. Begin Phase 4 (Frontend Dashboard).
 
 See `.planning/PROJECT.md` for full architecture and constraints.
 
@@ -35,9 +35,14 @@ See `.planning/PROJECT.md` for full architecture and constraints.
 | 02 | 03 | 2min | 2 | 4 | 2026-02-23 |
 | 02 | 04 | 5min | 2 | 5 | 2026-02-23 |
 | 03 | 01 | 3min | 2 | 2 | 2026-03-02 |
+| 03 | 02 | 3min | 1 | 3 | 2026-03-02 |
 
 ## Recent Decisions
 
+- 2026-03-02: Routes contain zero business logic — thin delegation to Predictor via app.state
+- 2026-03-02: Lifespan context manager for model loading (fail-fast on startup)
+- 2026-03-02: Static files mounted AFTER router so API routes take precedence
+- 2026-03-02: 422 errors flattened to {"error": "message"} format for simplicity
 - 2026-03-02: Threshold-based insight analysis chosen over SHAP/LIME — maps to stress definition, educational, no extra libraries
 - 2026-03-02: Predictor encapsulates all ML state, no global model variables — instantiated once via FastAPI lifespan
 - 2026-03-02: Running savings starts at 0 and floored at 0 via max(0,...) to match synthetic generator behavior
@@ -65,24 +70,29 @@ See `.planning/PROJECT.md` for full architecture and constraints.
 
 ## Next Action
 
-**Phase 3 Plan 02**: FastAPI application setup (main.py + routes.py)
+**Begin Phase 4**: Frontend Dashboard
 
-**Phase 3 Plan 01 artifacts ready for Plan 02:**
-- `backend/api/schemas.py` - all 6 Pydantic v2 models (MonthlyEntry, PredictRequest, PredictResponse, HealthResponse, ComputedFeatures, InsightsObject)
-- `backend/ml/predictor.py` - Predictor class (load, predict, health, _build_dataframe, _compute_insights)
+**Phase 3 artifacts ready for Phase 4:**
+- `backend/main.py` - FastAPI app serving at localhost:8000
+- `backend/api/routes.py` - POST /predict, GET /health
+- `backend/api/schemas.py` - Pydantic request/response models
+- `backend/ml/predictor.py` - Predictor class with full inference pipeline
+- Static files mount at "/" serves frontend/ directory
 
-**Architecture for Plan 02:**
-- `backend/main.py` - FastAPI app with lifespan, CORS, custom 422 handler, static file mount
-- `backend/api/routes.py` - thin route handlers for /predict and /health
+**Architecture for Phase 4:**
+- `frontend/index.html` - Dashboard UI
+- `frontend/app.js` - fetch calls, DOM updates
+- `frontend/styles.css` - Clean styling
+- No frameworks, no build tools — vanilla JS only
 
-**Note:** Start server from project root: `uvicorn backend.main:app` (paths in settings.py are relative to project root)
+**Start server:** `uvicorn backend.main:app` from project root
 
 ## Last Session
 
-**Session timestamp:** 2026-03-02T07:56:03Z
-**Stopped at:** Completed 03-api-layer-orchestration/03-01-PLAN.md
-**Status:** Phase 3 Plan 01 complete - schemas and predictor built, both verified working
+**Session timestamp:** 2026-03-02T08:03:00Z
+**Stopped at:** Completed 03-api-layer-orchestration/03-02-PLAN.md
+**Status:** Phase 3 fully complete - API functional with /predict and /health endpoints
 
 ---
 
-*Updated: 2026-03-02 after Phase 3 Plan 01 completion*
+*Updated: 2026-03-02 after Phase 3 Plan 02 completion*
