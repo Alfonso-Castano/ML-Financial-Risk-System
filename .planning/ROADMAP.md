@@ -91,6 +91,12 @@ Plans:
 - Routes are thin
 - ml/predictor.py orchestration
 
+**Plans:** 2 plans
+
+Plans:
+- [ ] 03-01-PLAN.md --- Pydantic schemas and Predictor class (inference pipeline)
+- [ ] 03-02-PLAN.md --- Thin routes, FastAPI app, and end-to-end API verification
+
 ---
 
 ## Phase 4: Frontend Dashboard
