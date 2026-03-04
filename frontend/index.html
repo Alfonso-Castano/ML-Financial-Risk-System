@@ -2,9 +2,469 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Financial Risk Dashboard</title>
+
+  <!-- Plus Jakarta Sans — closest free match to Anthropic's Styrene typeface -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-  <p>Frontend coming in Phase 4.</p>
+
+<div class="page-wrapper">
+
+  <!-- ======================================================================
+       HEADER
+  ====================================================================== -->
+  <header class="site-header">
+    <h1>Financial Risk Dashboard</h1>
+    <p class="subtitle">ML-powered financial stress prediction</p>
+  </header>
+
+  <!-- ======================================================================
+       TAB NAVIGATION
+  ====================================================================== -->
+  <nav class="tab-nav" role="tablist" aria-label="Dashboard sections">
+    <button
+      class="tab-btn active"
+      role="tab"
+      aria-selected="true"
+      aria-controls="tab-predict"
+      data-tab="predict">
+      Predict
+    </button>
+    <button
+      class="tab-btn"
+      role="tab"
+      aria-selected="false"
+      aria-controls="tab-about"
+      data-tab="about">
+      About the Model
+    </button>
+  </nav>
+
+  <!-- ======================================================================
+       TAB: PREDICT
+  ====================================================================== -->
+  <section id="tab-predict" class="tab-panel active" role="tabpanel" aria-labelledby="tab-btn-predict">
+
+    <div class="predict-layout">
+
+      <!-- ----------------------------------------------------------------
+           LEFT COLUMN — Form
+      ---------------------------------------------------------------- -->
+      <div class="form-area">
+
+        <!-- Validation summary banner (shown when form has errors) -->
+        <div
+          id="validationBanner"
+          class="validation-banner"
+          role="alert"
+          aria-live="polite">
+          <p class="validation-banner-title">Please fix the following errors:</p>
+          <ul class="validation-banner-list" id="validationBannerList"></ul>
+        </div>
+
+        <!-- Month grid -->
+        <form id="predictForm" novalidate>
+
+          <table class="month-grid" id="monthGrid">
+            <thead>
+              <tr>
+                <th scope="col">Month</th>
+                <th scope="col">Income ($)</th>
+                <th scope="col">Expenses ($)</th>
+                <th scope="col">Debt Payment ($)</th>
+              </tr>
+            </thead>
+            <tbody>
+
+              <!-- Rows 1-6: required / core months -->
+              <tr data-month="1">
+                <td class="month-label">Month 1</td>
+                <td><input type="number" class="grid-input income" placeholder="4500" min="0" step="0.01" aria-label="Month 1 income"></td>
+                <td><input type="number" class="grid-input expenses" placeholder="3200" min="0" step="0.01" aria-label="Month 1 expenses"></td>
+                <td><input type="number" class="grid-input debt" placeholder="500" min="0" step="0.01" aria-label="Month 1 debt payment"></td>
+              </tr>
+              <tr data-month="2">
+                <td class="month-label">Month 2</td>
+                <td><input type="number" class="grid-input income" placeholder="4500" min="0" step="0.01" aria-label="Month 2 income"></td>
+                <td><input type="number" class="grid-input expenses" placeholder="3200" min="0" step="0.01" aria-label="Month 2 expenses"></td>
+                <td><input type="number" class="grid-input debt" placeholder="500" min="0" step="0.01" aria-label="Month 2 debt payment"></td>
+              </tr>
+              <tr data-month="3">
+                <td class="month-label">Month 3</td>
+                <td><input type="number" class="grid-input income" placeholder="4500" min="0" step="0.01" aria-label="Month 3 income"></td>
+                <td><input type="number" class="grid-input expenses" placeholder="3200" min="0" step="0.01" aria-label="Month 3 expenses"></td>
+                <td><input type="number" class="grid-input debt" placeholder="500" min="0" step="0.01" aria-label="Month 3 debt payment"></td>
+              </tr>
+              <tr data-month="4">
+                <td class="month-label">Month 4</td>
+                <td><input type="number" class="grid-input income" placeholder="4500" min="0" step="0.01" aria-label="Month 4 income"></td>
+                <td><input type="number" class="grid-input expenses" placeholder="3200" min="0" step="0.01" aria-label="Month 4 expenses"></td>
+                <td><input type="number" class="grid-input debt" placeholder="500" min="0" step="0.01" aria-label="Month 4 debt payment"></td>
+              </tr>
+              <tr data-month="5">
+                <td class="month-label">Month 5</td>
+                <td><input type="number" class="grid-input income" placeholder="4500" min="0" step="0.01" aria-label="Month 5 income"></td>
+                <td><input type="number" class="grid-input expenses" placeholder="3200" min="0" step="0.01" aria-label="Month 5 expenses"></td>
+                <td><input type="number" class="grid-input debt" placeholder="500" min="0" step="0.01" aria-label="Month 5 debt payment"></td>
+              </tr>
+              <tr data-month="6">
+                <td class="month-label">Month 6</td>
+                <td><input type="number" class="grid-input income" placeholder="4500" min="0" step="0.01" aria-label="Month 6 income"></td>
+                <td><input type="number" class="grid-input expenses" placeholder="3200" min="0" step="0.01" aria-label="Month 6 expenses"></td>
+                <td><input type="number" class="grid-input debt" placeholder="500" min="0" step="0.01" aria-label="Month 6 debt payment"></td>
+              </tr>
+
+              <!-- Visual separator before optional rows -->
+              <tr class="optional-divider">
+                <td colspan="4">Optional — months 7 through 12</td>
+              </tr>
+
+              <!-- Rows 7-12: optional months (visually dimmed) -->
+              <tr data-month="7" class="optional-row">
+                <td class="month-label">Month 7</td>
+                <td><input type="number" class="grid-input income" placeholder="4500" min="0" step="0.01" aria-label="Month 7 income"></td>
+                <td><input type="number" class="grid-input expenses" placeholder="3200" min="0" step="0.01" aria-label="Month 7 expenses"></td>
+                <td><input type="number" class="grid-input debt" placeholder="500" min="0" step="0.01" aria-label="Month 7 debt payment"></td>
+              </tr>
+              <tr data-month="8" class="optional-row">
+                <td class="month-label">Month 8</td>
+                <td><input type="number" class="grid-input income" placeholder="4500" min="0" step="0.01" aria-label="Month 8 income"></td>
+                <td><input type="number" class="grid-input expenses" placeholder="3200" min="0" step="0.01" aria-label="Month 8 expenses"></td>
+                <td><input type="number" class="grid-input debt" placeholder="500" min="0" step="0.01" aria-label="Month 8 debt payment"></td>
+              </tr>
+              <tr data-month="9" class="optional-row">
+                <td class="month-label">Month 9</td>
+                <td><input type="number" class="grid-input income" placeholder="4500" min="0" step="0.01" aria-label="Month 9 income"></td>
+                <td><input type="number" class="grid-input expenses" placeholder="3200" min="0" step="0.01" aria-label="Month 9 expenses"></td>
+                <td><input type="number" class="grid-input debt" placeholder="500" min="0" step="0.01" aria-label="Month 9 debt payment"></td>
+              </tr>
+              <tr data-month="10" class="optional-row">
+                <td class="month-label">Month 10</td>
+                <td><input type="number" class="grid-input income" placeholder="4500" min="0" step="0.01" aria-label="Month 10 income"></td>
+                <td><input type="number" class="grid-input expenses" placeholder="3200" min="0" step="0.01" aria-label="Month 10 expenses"></td>
+                <td><input type="number" class="grid-input debt" placeholder="500" min="0" step="0.01" aria-label="Month 10 debt payment"></td>
+              </tr>
+              <tr data-month="11" class="optional-row">
+                <td class="month-label">Month 11</td>
+                <td><input type="number" class="grid-input income" placeholder="4500" min="0" step="0.01" aria-label="Month 11 income"></td>
+                <td><input type="number" class="grid-input expenses" placeholder="3200" min="0" step="0.01" aria-label="Month 11 expenses"></td>
+                <td><input type="number" class="grid-input debt" placeholder="500" min="0" step="0.01" aria-label="Month 11 debt payment"></td>
+              </tr>
+              <tr data-month="12" class="optional-row">
+                <td class="month-label">Month 12</td>
+                <td><input type="number" class="grid-input income" placeholder="4500" min="0" step="0.01" aria-label="Month 12 income"></td>
+                <td><input type="number" class="grid-input expenses" placeholder="3200" min="0" step="0.01" aria-label="Month 12 expenses"></td>
+                <td><input type="number" class="grid-input debt" placeholder="500" min="0" step="0.01" aria-label="Month 12 debt payment"></td>
+              </tr>
+
+            </tbody>
+          </table>
+
+          <!-- Credit score — outside the grid, applies to all months -->
+          <div class="credit-score-row">
+            <label for="creditScore">Credit Score</label>
+            <input
+              type="number"
+              id="creditScore"
+              class="credit-score-input"
+              placeholder="720"
+              min="300"
+              max="850"
+              step="1"
+              aria-label="Credit score between 300 and 850">
+            <span class="credit-score-hint">300 – 850</span>
+          </div>
+
+          <!-- CSV upload — alternative input method -->
+          <div class="csv-section">
+            <span class="csv-upload-label">Or upload CSV:</span>
+            <div class="csv-actions">
+              <!-- Hidden file input, triggered by the label-styled button -->
+              <input type="file" id="csvUpload" accept=".csv" aria-label="Upload CSV file">
+              <label for="csvUpload" class="csv-upload-btn" role="button" tabindex="0">
+                Choose File
+              </label>
+              <button
+                type="button"
+                id="downloadTemplate"
+                class="csv-template-link"
+                aria-label="Download CSV template">
+                Download Template
+              </button>
+              <span class="csv-filename" id="csvFilename" aria-live="polite"></span>
+            </div>
+          </div>
+
+          <!-- Predict action -->
+          <div class="predict-btn-row">
+            <button type="submit" id="predictBtn" class="predict-btn">
+              Predict Risk
+            </button>
+          </div>
+
+        </form>
+      </div><!-- /.form-area -->
+
+      <!-- ----------------------------------------------------------------
+           RIGHT COLUMN — Results panel
+      ---------------------------------------------------------------- -->
+      <div id="resultsPanel" class="results-panel is-empty" role="region" aria-label="Prediction results" aria-live="polite">
+
+        <!-- STATE: EMPTY — shown on initial load -->
+        <div class="state-empty">
+          <div class="empty-icon" aria-hidden="true">&#x1F4CA;</div>
+          <p class="empty-title">No prediction yet</p>
+          <p class="empty-desc">Enter financial data and click Predict to see your risk assessment.</p>
+        </div>
+
+        <!-- STATE: LOADING — shimmer skeletons shown while waiting for API -->
+        <div class="state-loading" aria-label="Loading prediction...">
+          <div class="skeleton skeleton-gauge"></div>
+          <div class="skeleton skeleton-text-lg"></div>
+          <div class="skeleton skeleton-text-sm"></div>
+          <div class="skeleton skeleton-label"></div>
+          <div class="skeleton skeleton-card"></div>
+          <div class="skeleton skeleton-card"></div>
+          <div class="skeleton skeleton-card"></div>
+        </div>
+
+        <!-- STATE: RESULTS — populated by app.js after successful prediction -->
+        <div class="state-results">
+
+          <!-- Gauge -->
+          <div class="gauge-wrapper">
+            <svg
+              class="gauge"
+              viewBox="0 0 100 100"
+              width="180"
+              height="180"
+              aria-hidden="true">
+
+              <!-- Background arc: 270° of a full circle (188.5 / 251.3) -->
+              <circle
+                class="gauge-bg"
+                cx="50" cy="50" r="40"
+                stroke-width="10"
+                stroke-dasharray="188.5 251.3"
+                fill="none" />
+
+              <!-- Fill arc: starts at 0, animated by app.js -->
+              <circle
+                class="gauge-fill"
+                cx="50" cy="50" r="40"
+                stroke-width="10"
+                stroke-dasharray="0 251.3"
+                fill="none"
+                stroke-linecap="round" />
+
+              <!-- Label group counter-rotated so text reads upright -->
+              <g class="gauge-label-group">
+                <text class="gauge-label" x="50" y="48" text-anchor="middle">--</text>
+                <text class="gauge-sublabel" x="50" y="60" text-anchor="middle">RISK SCORE</text>
+              </g>
+            </svg>
+
+            <!-- Risk category label below gauge -->
+            <p class="gauge-category" id="riskCategory" aria-live="polite"></p>
+            <p class="risk-score-display">
+              Probability: <strong id="riskProbability">—</strong>
+            </p>
+          </div>
+
+          <!-- Debt payment defaulted note (hidden unless API flags it) -->
+          <div class="debt-warning" id="debtWarning" role="note">
+            <strong>Note:</strong> One or more months had no debt payment recorded.
+            If you carry debt, enter the monthly payment above for a more accurate prediction.
+          </div>
+
+          <!-- Insights -->
+          <div class="insights-section">
+            <p class="section-title">Risk Factors</p>
+            <p class="insights-summary" id="insightsSummary"></p>
+            <div id="insightsContainer"></div>
+          </div>
+
+          <!-- Computed features -->
+          <div class="features-section">
+            <p class="section-title">Computed Features</p>
+            <div class="features-grid" id="featuresGrid"></div>
+          </div>
+
+        </div><!-- /.state-results -->
+
+        <!-- STATE: ERROR — shown when API returns an error -->
+        <div class="state-error">
+          <div class="error-icon" aria-hidden="true">&#x26A0;&#xFE0F;</div>
+          <p class="error-title">Prediction failed</p>
+          <p class="error-message" id="errorMessage">An error occurred. Please try again.</p>
+          <button type="button" id="retryBtn" class="retry-btn">Try Again</button>
+        </div>
+
+      </div><!-- /#resultsPanel -->
+
+    </div><!-- /.predict-layout -->
+
+  </section><!-- /#tab-predict -->
+
+
+  <!-- ======================================================================
+       TAB: ABOUT THE MODEL
+  ====================================================================== -->
+  <section id="tab-about" class="tab-panel" role="tabpanel" aria-labelledby="tab-btn-about">
+    <div class="about-layout">
+
+      <!-- Model Architecture -->
+      <div class="about-section">
+        <h2>Model Architecture</h2>
+        <p>
+          This dashboard uses a feedforward neural network (Multi-Layer Perceptron) trained
+          to classify financial stress from a sequence of monthly financial records. The
+          network is implemented in PyTorch with the following architecture:
+        </p>
+        <div class="arch-block">Input (9 features)
+  ↓
+Dense(128) + ReLU + Dropout
+  ↓
+Dense(64)  + ReLU + Dropout
+  ↓
+Dense(1)   + Sigmoid → probability 0–1</div>
+        <p>
+          The output is a probability between 0 and 1. Scores are converted to a 0–100
+          risk scale and bucketed into three categories based on calibrated thresholds.
+        </p>
+      </div>
+
+      <!-- Stress Definition -->
+      <div class="about-section">
+        <h2>Stress Definition</h2>
+        <p>
+          The model was trained to predict financial stress using the following definition,
+          applied consistently during synthetic data generation and labeling:
+        </p>
+        <ul>
+          <li><strong>Savings below 1 month of expenses</strong> at the end of the window, OR</li>
+          <li><strong>3 or more consecutive months</strong> of negative cash flow</li>
+        </ul>
+        <p>
+          A profile is labeled stressed if either condition is true. Both conditions can
+          occur simultaneously and reinforce each other.
+        </p>
+      </div>
+
+      <!-- Risk Categories -->
+      <div class="about-section">
+        <h2>Risk Categories</h2>
+        <table class="risk-table" aria-label="Risk category thresholds">
+          <thead>
+            <tr>
+              <th>Category</th>
+              <th>Score Range</th>
+              <th>Interpretation</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><span class="risk-badge low">Low</span></td>
+              <td>&lt; 35</td>
+              <td>Financial position appears stable. Low likelihood of stress indicators.</td>
+            </tr>
+            <tr>
+              <td><span class="risk-badge medium">Medium</span></td>
+              <td>35 – 64</td>
+              <td>Some risk factors present. Monitor savings and cash flow patterns.</td>
+            </tr>
+            <tr>
+              <td><span class="risk-badge high">High</span></td>
+              <td>&ge; 65</td>
+              <td>Multiple stress indicators detected. Review debt obligations and expense levels.</td>
+            </tr>
+          </tbody>
+        </table>
+        <p style="margin-top: var(--space-3);">
+          The thresholds (35 and 65) are intentionally wider than the model's internal 0.5
+          decision boundary to communicate uncertainty — a score of 50 sits in the medium
+          band rather than forcing a binary high/low split.
+        </p>
+      </div>
+
+      <!-- The 9 Features -->
+      <div class="about-section">
+        <h2>Input Features (9 total)</h2>
+        <p>
+          Raw monthly inputs are aggregated into 9 engineered features before being fed
+          to the model. This is the feature engineering layer:
+        </p>
+        <ul>
+          <li><strong>avg_income</strong> — Average monthly income across all submitted months</li>
+          <li><strong>avg_expenses</strong> — Average monthly expenses across all submitted months</li>
+          <li><strong>final_savings</strong> — Cumulative savings at the end of the window (floored at 0)</li>
+          <li><strong>debt_payment</strong> — Fixed monthly debt payment amount</li>
+          <li><strong>credit_score</strong> — Credit score (300–850)</li>
+          <li><strong>debt_ratio</strong> — Debt payment ÷ free cash flow (income − expenses)</li>
+          <li><strong>liquidity_ratio</strong> — Final savings ÷ average monthly expenses</li>
+          <li><strong>net_cash_flow</strong> — Average monthly income minus average monthly expenses</li>
+          <li><strong>consec_negative_months</strong> — Longest run of consecutive months where income &lt; expenses + debt_payment</li>
+        </ul>
+      </div>
+
+      <!-- Training Data -->
+      <div class="about-section">
+        <h2>Training Data</h2>
+        <p>
+          The model was trained on <strong>3,000 synthetic financial profiles</strong> generated
+          across four archetypes that reflect real-world income bands:
+        </p>
+        <ul>
+          <li><strong>Struggling</strong> — Low income, expenses near or above income, minimal savings</li>
+          <li><strong>Getting by</strong> — Moderate income, positive but thin cash flow</li>
+          <li><strong>Stable</strong> — Comfortable income-to-expense ratio, some savings buffer</li>
+          <li><strong>Comfortable</strong> — High income, strong savings, low debt ratio</li>
+        </ul>
+        <p>
+          The synthetic generator calibrated archetype parameters to achieve approximately
+          35% stressed profiles, matching realistic population distributions. Each profile
+          spans 12 months with 15% monthly variance on income and expenses.
+        </p>
+
+        <!-- Live metrics from GET /health -->
+        <h3>Model Performance</h3>
+        <div class="metrics-row" id="modelMetrics">
+          <div class="metric-card">
+            <p class="metric-label">Recall</p>
+            <p class="metric-value loading-placeholder" id="metricRecall">Loading…</p>
+          </div>
+          <div class="metric-card">
+            <p class="metric-label">ROC-AUC</p>
+            <p class="metric-value loading-placeholder" id="metricRocAuc">Loading…</p>
+          </div>
+          <div class="metric-card">
+            <p class="metric-label">Feature Count</p>
+            <p class="metric-value loading-placeholder" id="metricFeatureCount">Loading…</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Educational Note -->
+      <div class="edu-note">
+        <strong>Learning context:</strong> This dashboard is a hands-on demonstration of
+        integrating a PyTorch ML model into a web application — from synthetic data generation
+        and model training through FastAPI backend orchestration to this vanilla JS frontend.
+        The goal is architectural clarity: each layer has a defined responsibility, no
+        frameworks obscure the data flow, and every step from raw input to prediction is
+        visible in the codebase.
+      </div>
+
+    </div><!-- /.about-layout -->
+  </section><!-- /#tab-about -->
+
+</div><!-- /.page-wrapper -->
+
+<script src="app.js"></script>
 </body>
 </html>
