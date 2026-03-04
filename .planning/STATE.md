@@ -2,9 +2,9 @@
 
 ## Current Status
 
-**Phase**: 03 - API Layer & Orchestration
-**Current Plan**: Phase 3 complete (2/2 plans done)
-**Last Updated**: 2026-03-02
+**Phase**: 04 - Frontend Dashboard
+**Current Plan**: 04-01 complete (1/3 plans done)
+**Last Updated**: 2026-03-04
 
 ## Progress
 
@@ -13,7 +13,7 @@
 | 1: Foundation & Synthetic Data | ✓ Complete | 100% (1/1 plans) |
 | 2: ML Model & Training | ✓ Complete | 100% (4/4 plans complete) |
 | 3: API Layer & Orchestration | ✓ Complete | 100% (2/2 plans complete) |
-| 4: Frontend Dashboard | ○ Pending | 0% |
+| 4: Frontend Dashboard | ◆ In Progress | 33% (1/3 plans complete) |
 | 5: Deployment & Documentation | ○ Pending | 0% |
 
 **Legend**: ○ Pending | ◆ In Progress | ✓ Complete
@@ -21,7 +21,7 @@
 ## Project Context
 
 **Core Value**: Learn how to integrate ML models into applications with clean architecture
-**Current Focus**: Phase 3 complete - API fully functional. Begin Phase 4 (Frontend Dashboard).
+**Current Focus**: Phase 4 in progress — 04-01 complete (CSS + HTML foundation). Next: 04-02 (JavaScript behavior).
 
 See `.planning/PROJECT.md` for full architecture and constraints.
 
@@ -36,9 +36,15 @@ See `.planning/PROJECT.md` for full architecture and constraints.
 | 02 | 04 | 5min | 2 | 5 | 2026-02-23 |
 | 03 | 01 | 3min | 2 | 2 | 2026-03-02 |
 | 03 | 02 | 3min | 1 | 3 | 2026-03-02 |
+| 04 | 01 | 4min 14sec | 2 | 2 | 2026-03-04 |
 
 ## Recent Decisions
 
+- 2026-03-04: Rows 1-6 as core required months; rows 7-12 optional-row (opacity 0.6) with divider — UX clarity without hiding months
+- 2026-03-04: SVG gauge hand-rolled (not svg-gauge library) — 5-line math, no CDN dependency, educational
+- 2026-03-04: Results panel state controlled by class on container (.is-empty/.is-loading/.has-results/.is-error)
+- 2026-03-04: CSS shimmer via 5-stop gradient background-size: 300% + @keyframes — pure CSS, no JS
+- 2026-03-04: Insight cards use max-height 0/300px CSS transition (not max-height: auto which cannot animate)
 - 2026-03-02: Routes contain zero business logic — thin delegation to Predictor via app.state
 - 2026-03-02: Lifespan context manager for model loading (fail-fast on startup)
 - 2026-03-02: Static files mounted AFTER router so API routes take precedence
@@ -70,29 +76,20 @@ See `.planning/PROJECT.md` for full architecture and constraints.
 
 ## Next Action
 
-**Begin Phase 4**: Frontend Dashboard
+**Continue Phase 4**: 04-02 (JavaScript behavior — fetch, DOM wiring, validation, gauge animation)
 
-**Phase 3 artifacts ready for Phase 4:**
-- `backend/main.py` - FastAPI app serving at localhost:8000
-- `backend/api/routes.py` - POST /predict, GET /health
-- `backend/api/schemas.py` - Pydantic request/response models
-- `backend/ml/predictor.py` - Predictor class with full inference pipeline
-- Static files mount at "/" serves frontend/ directory
-
-**Architecture for Phase 4:**
-- `frontend/index.html` - Dashboard UI
-- `frontend/app.js` - fetch calls, DOM updates
-- `frontend/styles.css` - Clean styling
-- No frameworks, no build tools — vanilla JS only
+**04-01 artifacts ready for 04-02:**
+- `frontend/styles.css` — All selectors, states, and animations defined
+- `frontend/index.html` — All DOM IDs and classes present, ready for querySelector
 
 **Start server:** `uvicorn backend.main:app` from project root
 
 ## Last Session
 
-**Session timestamp:** 2026-03-02T08:03:00Z
-**Stopped at:** Completed 03-api-layer-orchestration/03-02-PLAN.md
-**Status:** Phase 3 fully complete - API functional with /predict and /health endpoints
+**Session timestamp:** 2026-03-04T06:54:04Z
+**Stopped at:** Completed 04-frontend-dashboard/04-01-PLAN.md
+**Status:** Phase 4 Plan 01 complete — CSS design system and HTML foundation built
 
 ---
 
-*Updated: 2026-03-02 after Phase 3 Plan 02 completion*
+*Updated: 2026-03-04 after Phase 4 Plan 01 completion*
