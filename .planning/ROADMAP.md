@@ -121,6 +121,12 @@ Plans:
 - CSS styling
 - No frameworks
 
+**Plans:** 2 plans
+
+Plans:
+- [ ] 04-01-PLAN.md --- Design system (styles.css) and HTML structure (index.html)
+- [ ] 04-02-PLAN.md --- JavaScript behavior (app.js) and visual verification
+
 ---
 
 ## Phase 5: Deployment & Documentation
