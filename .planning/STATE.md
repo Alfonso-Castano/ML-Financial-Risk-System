@@ -3,8 +3,8 @@
 ## Current Status
 
 **Phase**: 04 - Frontend Dashboard
-**Current Plan**: 04-01 complete (1/3 plans done)
-**Last Updated**: 2026-03-04
+**Current Plan**: 04-02 complete (2/3 plans done)
+**Last Updated**: 2026-03-06
 
 ## Progress
 
@@ -13,7 +13,7 @@
 | 1: Foundation & Synthetic Data | ✓ Complete | 100% (1/1 plans) |
 | 2: ML Model & Training | ✓ Complete | 100% (4/4 plans complete) |
 | 3: API Layer & Orchestration | ✓ Complete | 100% (2/2 plans complete) |
-| 4: Frontend Dashboard | ◆ In Progress | 33% (1/3 plans complete) |
+| 4: Frontend Dashboard | ◆ In Progress | 67% (2/3 plans complete) |
 | 5: Deployment & Documentation | ○ Pending | 0% |
 
 **Legend**: ○ Pending | ◆ In Progress | ✓ Complete
@@ -21,7 +21,7 @@
 ## Project Context
 
 **Core Value**: Learn how to integrate ML models into applications with clean architecture
-**Current Focus**: Phase 4 in progress — 04-01 complete (CSS + HTML foundation). Next: 04-02 (JavaScript behavior).
+**Current Focus**: Phase 4 in progress — 04-02 complete (full JavaScript dashboard). Next: 04-03 (final phase review / polish if needed, then Phase 5 deployment).
 
 See `.planning/PROJECT.md` for full architecture and constraints.
 
@@ -37,9 +37,14 @@ See `.planning/PROJECT.md` for full architecture and constraints.
 | 03 | 01 | 3min | 2 | 2 | 2026-03-02 |
 | 03 | 02 | 3min | 1 | 3 | 2026-03-02 |
 | 04 | 01 | 4min 14sec | 2 | 2 | 2026-03-04 |
+| 04 | 02 | ~25min | 1+verify | 1 | 2026-03-06 |
 
 ## Recent Decisions
 
+- 2026-03-06: retryBtn calls handlePredict() (not submitPrediction directly) so validation re-runs on retry
+- 2026-03-06: CSV upload populates grid but does not auto-submit — user reviews pre-filled data and clicks Predict
+- 2026-03-06: fetchModelHealth() failure is non-fatal — About tab shows fallback text, Predict tab unaffected
+- 2026-03-06: Known issue: CSV upload grid population works but downstream prediction deferred — user confirmed low-priority
 - 2026-03-04: Rows 1-6 as core required months; rows 7-12 optional-row (opacity 0.6) with divider — UX clarity without hiding months
 - 2026-03-04: SVG gauge hand-rolled (not svg-gauge library) — 5-line math, no CDN dependency, educational
 - 2026-03-04: Results panel state controlled by class on container (.is-empty/.is-loading/.has-results/.is-error)
@@ -76,20 +81,21 @@ See `.planning/PROJECT.md` for full architecture and constraints.
 
 ## Next Action
 
-**Continue Phase 4**: 04-02 (JavaScript behavior — fetch, DOM wiring, validation, gauge animation)
+**Continue Phase 4**: 04-03 (final plan — likely UAT / end-to-end verification or Dockerfile)
 
-**04-01 artifacts ready for 04-02:**
-- `frontend/styles.css` — All selectors, states, and animations defined
-- `frontend/index.html` — All DOM IDs and classes present, ready for querySelector
+**04-02 artifacts ready for 04-03:**
+- `frontend/app.js` — complete JS behavior, all states working
+- `frontend/index.html` + `frontend/styles.css` — unchanged, verified
+- Full prediction flow confirmed: input → validate → POST /predict → gauge + insight cards + features grid
 
 **Start server:** `uvicorn backend.main:app` from project root
 
 ## Last Session
 
-**Session timestamp:** 2026-03-04T06:54:04Z
-**Stopped at:** Completed 04-frontend-dashboard/04-01-PLAN.md
-**Status:** Phase 4 Plan 01 complete — CSS design system and HTML foundation built
+**Session timestamp:** 2026-03-06T00:00:00Z
+**Stopped at:** Completed 04-frontend-dashboard/04-02-PLAN.md
+**Status:** Phase 4 Plan 02 complete — full JavaScript dashboard implemented and user-verified
 
 ---
 
-*Updated: 2026-03-04 after Phase 4 Plan 01 completion*
+*Updated: 2026-03-06 after Phase 4 Plan 02 completion*
