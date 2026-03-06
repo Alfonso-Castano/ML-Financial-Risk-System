@@ -407,9 +407,9 @@ Dense(1)   + Sigmoid → probability 0–1</div>
           <li><strong>debt_payment</strong> — Fixed monthly debt payment amount</li>
           <li><strong>credit_score</strong> — Credit score (300–850)</li>
           <li><strong>debt_ratio</strong> — Debt payment ÷ free cash flow (income − expenses)</li>
-          <li><strong>liquidity_ratio</strong> — Final savings ÷ average monthly expenses</li>
+          <li><strong>expense_volatility</strong> — Std dev ÷ mean of monthly expenses (coefficient of variation). Higher = more erratic spending.</li>
           <li><strong>net_cash_flow</strong> — Average monthly income minus average monthly expenses</li>
-          <li><strong>consec_negative_months</strong> — Longest run of consecutive months where income &lt; expenses + debt_payment</li>
+          <li><strong>savings_trend</strong> — Linear slope of cumulative savings over the window ($/month). Negative = declining savings.</li>
         </ul>
       </div>
 

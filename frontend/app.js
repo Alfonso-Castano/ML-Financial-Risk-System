@@ -21,9 +21,9 @@ const FEATURE_LABELS = {
   debt_payment:           'Monthly Debt Payment',
   credit_score:           'Credit Score',
   debt_ratio:             'Debt Ratio',
-  liquidity_ratio:        'Liquidity Ratio',
+  expense_volatility:     'Expense Volatility',
   net_cash_flow:          'Net Cash Flow',
-  consec_negative_months: 'Consecutive Negative Months',
+  savings_trend:          'Savings Trend ($/mo)',
 };
 
 // Risk color hex values (matching CSS variables --color-risk-*)
@@ -593,11 +593,12 @@ function formatFeatureValue(key, value) {
 
   switch (key) {
     case 'debt_ratio':
-    case 'liquidity_ratio':
+    case 'expense_volatility':
       return value.toFixed(2);
 
-    case 'consec_negative_months':
-      return Math.round(value).toString();
+    case 'savings_trend':
+      // Dollar per month — can be negative, so show sign
+      return (value >= 0 ? '+$' : '-$') + Math.abs(Math.round(value)).toLocaleString() + '/mo';
 
     case 'credit_score':
       return Math.round(value).toString();
