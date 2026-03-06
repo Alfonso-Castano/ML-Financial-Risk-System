@@ -66,7 +66,9 @@ See `.planning/PROJECT.md` for full architecture and constraints.
 - 2026-02-23: squeeze(-1) used instead of squeeze() to handle single-sample last-batch shape mismatch in BCELoss
 - 2026-02-23: training_history.json saved at end of __main__ so evaluate.py can generate loss plots independently
 - 2026-02-23: num_workers=0 in DataLoaders for Windows compatibility with PyTorch multiprocessing
-- 2026-02-23: Feature set locked to 9: avg_income, avg_expenses, final_savings, debt_payment, credit_score, debt_ratio, liquidity_ratio, net_cash_flow, consec_negative_months
+- 2026-03-06: Feature set updated to 9: avg_income, avg_expenses, final_savings, debt_payment, credit_score, debt_ratio, expense_volatility, net_cash_flow, savings_trend (replaced circular liquidity_ratio + consec_negative_months)
+- 2026-03-06: Archetype overlap widened (MONTHLY_VARIANCE 0.15→0.25, overlapping income/expense ranges) to produce borderline profiles
+- 2026-03-06: Model retrained — ROC-AUC 0.939 (was 0.998), recall 76%, precision 80%, middle-zone predictions 10.4%
 - 2026-02-23: debt_ratio denominator is free cash flow (income - expenses), not gross income
 - 2026-02-23: Named layer attributes (fc1, relu1, dropout1...) over nn.Sequential for educational clarity
 - 2026-02-23: Scaling is external to FinancialDataset - StandardScaler fits in train.py to prevent data leakage
@@ -78,6 +80,12 @@ See `.planning/PROJECT.md` for full architecture and constraints.
 - 2026-02-13: Project initialized with minimal GSD structure
 - 2026-02-13: Architecture locked (no service layer, no database, vanilla JS)
 - 2026-02-13: Complexity guardrails added to CLAUDE.md
+
+### Quick Tasks Completed
+
+| # | Description | Date | Commit | Directory |
+|---|-------------|------|--------|-----------|
+| 1 | Fix circular feature-label dependency causing sigmoid saturation | 2026-03-06 | 1b3e0c8 | [1-fix-circular-feature-label-dependency-ca](./quick/1-fix-circular-feature-label-dependency-ca/) |
 
 ## Next Action
 
@@ -98,8 +106,8 @@ See `.planning/PROJECT.md` for full architecture and constraints.
 ## Last Session
 
 **Session timestamp:** 2026-03-06
-**Stopped at:** Phase 4 complete — all plans executed and verified
-**Status:** Phase 4 fully complete — vanilla JS dashboard functional
+**Stopped at:** Quick task 1 complete — sigmoid saturation fixed
+**Status:** Circular features replaced, archetypes widened, model retrained with realistic metrics (ROC-AUC 0.939)
 
 ---
 
