@@ -11,7 +11,7 @@ RANDOM_SEED = 42
 MONTHS_HISTORY = 12
 
 # Variance and fluctuation
-MONTHLY_VARIANCE = 0.15  # 15% monthly fluctuation in income and expenses
+MONTHLY_VARIANCE = 0.25  # 25% monthly fluctuation — increased from 0.15 to create borderline profiles
 
 # Stress labeling thresholds
 STRESS_SAVINGS_THRESHOLD = 1.0  # Savings must be >= 1 month expenses
@@ -24,36 +24,40 @@ TARGET_STRESS_RATIO = 0.35
 CREDIT_SCORE_RANGE = (300, 850)
 
 # Financial archetypes
-# Each archetype represents a recognizable financial profile type
-# Adjusted to achieve ~35% stress ratio through realistic financial stress patterns
+# Each archetype represents a recognizable financial profile type.
+# Income ranges and expense ratios intentionally OVERLAP between archetypes so that
+# borderline profiles emerge naturally: a "getting_by" person with a bad run of months
+# can look like "struggling", and a "struggling" person with a good run can look like
+# "getting_by". Combined with higher MONTHLY_VARIANCE this creates genuine uncertainty
+# in the training data, forcing the model to learn probability rather than memorize rules.
 ARCHETYPES = {
     "struggling": {
-        "income_range": (30000, 45000),
-        "savings_months": (0, 0.2),         # Almost no savings buffer
-        "expense_ratio": (0.95, 1.10),      # Frequently spending more than income
-        "credit_score_mean": 620,
-        "weight": 0.30                      # Increased to create more stressed profiles
+        "income_range": (28000, 58000),     # Wide range overlapping getting_by
+        "savings_months": (0, 3.0),         # Range: no savings to 3 months buffer
+        "expense_ratio": (0.85, 1.12),      # High ratio overlapping getting_by
+        "credit_score_mean": 630,
+        "weight": 0.30
     },
     "getting_by": {
-        "income_range": (40000, 55000),
-        "savings_months": (0.1, 0.8),       # Very minimal savings buffer
-        "expense_ratio": (0.85, 0.98),      # High expense ratio with variance
-        "credit_score_mean": 670,
+        "income_range": (35000, 72000),     # Overlaps both struggling and stable
+        "savings_months": (0, 3.5),         # Range: no savings to 3.5 months buffer
+        "expense_ratio": (0.72, 1.02),      # Wide range overlapping both neighbors
+        "credit_score_mean": 665,
         "weight": 0.25
     },
     "stable": {
-        "income_range": (55000, 85000),
-        "savings_months": (2, 6),
-        "expense_ratio": (0.60, 0.75),      # Moderate expenses
-        "credit_score_mean": 720,
-        "weight": 0.28                      # Decreased to balance
+        "income_range": (48000, 92000),     # Lower end overlaps getting_by
+        "savings_months": (0.1, 8),         # Range: almost no savings to 8 months
+        "expense_ratio": (0.55, 0.88),      # Wide range overlapping getting_by at top
+        "credit_score_mean": 715,
+        "weight": 0.28
     },
     "comfortable": {
-        "income_range": (85000, 130000),
-        "savings_months": (4, 12),
-        "expense_ratio": (0.45, 0.60),      # Lower expenses
-        "credit_score_mean": 760,
-        "weight": 0.17                      # Decreased slightly
+        "income_range": (65000, 130000),    # Lower end overlaps stable
+        "savings_months": (0.5, 12),        # Range: half month to 12 months savings
+        "expense_ratio": (0.40, 0.70),      # Overlaps stable at the top end
+        "credit_score_mean": 755,
+        "weight": 0.17
     }
 }
 
