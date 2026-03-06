@@ -11,9 +11,9 @@ Feature set (in order):
     debt_payment          - Fixed monthly debt payment (constant per profile)
     credit_score          - Credit score (constant per profile)
     debt_ratio            - Debt payment relative to free cash flow
-    liquidity_ratio       - Savings relative to average monthly expenses
+    expense_volatility    - Coefficient of variation of monthly expenses (std/mean)
     net_cash_flow         - Income minus expenses minus debt payment
-    consec_negative_months - Longest streak of negative cash flow months
+    savings_trend         - Linear slope of cumulative savings ($/month)
 """
 
 import numpy as np
@@ -29,9 +29,9 @@ FEATURE_NAMES: List[str] = [
     'debt_payment',
     'credit_score',
     'debt_ratio',
-    'liquidity_ratio',
+    'expense_volatility',
     'net_cash_flow',
-    'consec_negative_months',
+    'savings_trend',
 ]
 
 
@@ -63,29 +63,48 @@ def compute_debt_ratio(
     return monthly_debt_payment / free_cash_flow
 
 
-def compute_liquidity_ratio(
-    final_savings: float,
-    avg_monthly_expenses: float,
-) -> float:
+def compute_expense_volatility(monthly_expenses: List[float]) -> float:
     """
-    Compute liquidity ratio as savings relative to average monthly expenses.
+    Measures expense instability as standard deviation relative to the mean.
+    Higher values indicate erratic spending patterns, a risk signal that correlates with
+    but does NOT directly encode the label conditions.
 
-    Formula: final_savings / avg_monthly_expenses
-
-    Measures how many months of expenses the person can cover with current
-    savings — a standard emergency fund metric. Returns 0.0 when average
-    expenses are zero or negative to avoid division by zero.
+    Formula: std(monthly_expenses) / mean(monthly_expenses) — coefficient of variation.
+    Returns 0.0 if mean is zero or fewer than 2 data points.
 
     Args:
-        final_savings: Savings balance at the end of the observation period (month 12).
-        avg_monthly_expenses: Mean total monthly expenses over the observation period.
+        monthly_expenses: List of monthly total expense values in chronological order.
 
     Returns:
-        Liquidity ratio as a float, or 0.0 if avg_monthly_expenses is non-positive.
+        Coefficient of variation as a float, or 0.0 for degenerate inputs.
     """
-    if avg_monthly_expenses <= 0:
+    if len(monthly_expenses) < 2:
         return 0.0
-    return final_savings / avg_monthly_expenses
+    mean_expenses = float(np.mean(monthly_expenses))
+    if mean_expenses == 0.0:
+        return 0.0
+    return float(np.std(monthly_expenses) / mean_expenses)
+
+
+def compute_savings_trend(cumulative_savings: List[float]) -> float:
+    """
+    Captures savings trajectory as the linear slope of cumulative savings
+    over the observation window. Negative slope signals deteriorating savings
+    without directly implementing any label threshold.
+
+    Formula: linear regression slope via np.polyfit — average monthly change
+    in savings (dollars per month). Positive = growing savings, negative = declining.
+    Returns 0.0 if fewer than 2 data points.
+
+    Args:
+        cumulative_savings: List of cumulative savings values in chronological order.
+
+    Returns:
+        Linear slope in dollars per month, or 0.0 for degenerate inputs.
+    """
+    if len(cumulative_savings) < 2:
+        return 0.0
+    return float(np.polyfit(range(len(cumulative_savings)), cumulative_savings, 1)[0])
 
 
 def compute_net_cash_flow(
@@ -131,33 +150,6 @@ def compute_cash_flow_volatility(monthly_cash_flows: List[float]) -> float:
     return float(np.std(monthly_cash_flows))
 
 
-def compute_consecutive_negative_months(monthly_cash_flows: List[float]) -> int:
-    """
-    Compute the longest streak of consecutive months with negative cash flow.
-
-    A sustained negative streak signals chronic overspending or income loss,
-    which is a strong predictor of financial stress. The stress label definition
-    uses 3+ consecutive negative months as one of its two conditions.
-
-    Args:
-        monthly_cash_flows: List of monthly (income - expenses) values in
-                            chronological order.
-
-    Returns:
-        Length of the longest negative cash-flow streak as an int.
-    """
-    max_streak = 0
-    current_streak = 0
-    for cash_flow in monthly_cash_flows:
-        if cash_flow < 0:
-            current_streak += 1
-            if current_streak > max_streak:
-                max_streak = current_streak
-        else:
-            current_streak = 0
-    return max_streak
-
-
 def engineer_features(profile_df: pd.DataFrame) -> Dict[str, float]:
     """
     Transform one profile's 12 monthly rows into a 9-feature dictionary.
@@ -182,14 +174,15 @@ def engineer_features(profile_df: pd.DataFrame) -> Dict[str, float]:
     debt_payment = float(group.iloc[0]['debt_payment'])  # fixed per profile
     credit_score = float(group.iloc[0]['credit_score'])  # fixed per profile
 
-    # Per-month cash flows used for streak analysis
-    cash_flows = (group['income'] - group['total_expenses']).tolist()
+    # Per-month series for volatility and trend features
+    monthly_expenses = group['total_expenses'].tolist()
+    savings_series = group['savings'].tolist()
 
     # Derived features
     debt_ratio = compute_debt_ratio(avg_income, avg_expenses, debt_payment)
-    liquidity_ratio = compute_liquidity_ratio(final_savings, avg_expenses)
+    expense_volatility = compute_expense_volatility(monthly_expenses)
     net_cash_flow = compute_net_cash_flow(avg_income, avg_expenses, debt_payment)
-    consec_negative_months = compute_consecutive_negative_months(cash_flows)
+    savings_trend = compute_savings_trend(savings_series)
 
     return {
         'avg_income': avg_income,
@@ -198,9 +191,9 @@ def engineer_features(profile_df: pd.DataFrame) -> Dict[str, float]:
         'debt_payment': debt_payment,
         'credit_score': credit_score,
         'debt_ratio': debt_ratio,
-        'liquidity_ratio': liquidity_ratio,
+        'expense_volatility': expense_volatility,
         'net_cash_flow': net_cash_flow,
-        'consec_negative_months': float(consec_negative_months),
+        'savings_trend': savings_trend,
     }
 
 

@@ -222,19 +222,20 @@ class Predictor:
         """
         risk_factors = []
 
-        # --- Liquidity: savings < 1 month of expenses is a stress condition ---
-        if features['liquidity_ratio'] < 1.0:
-            months_covered = round(features['liquidity_ratio'], 1)
+        # --- Expense volatility: highly erratic spending is a risk signal ---
+        if features['expense_volatility'] > 0.15:
+            pct = round(features['expense_volatility'] * 100, 1)
             risk_factors.append(
-                f"Low emergency fund: savings cover only {months_covered} months of expenses "
-                f"(recommended: 1+ months)"
+                f"Erratic spending pattern: monthly expenses vary by {pct}% relative to your average "
+                f"(high volatility increases financial instability risk)"
             )
 
-        # --- Consecutive negative cash flow months: 3+ is a stress condition ---
-        if features['consec_negative_months'] >= 3:
-            streak = int(features['consec_negative_months'])
+        # --- Savings trend: declining savings trajectory signals deterioration ---
+        if features['savings_trend'] < -100:
+            monthly_decline = abs(round(features['savings_trend']))
             risk_factors.append(
-                f"Sustained cash flow deficit: {streak} consecutive months of negative cash flow"
+                f"Declining savings trajectory: savings decreasing by approximately "
+                f"${monthly_decline}/month on average"
             )
 
         # --- Debt ratio: consuming the majority of free cash flow ---
