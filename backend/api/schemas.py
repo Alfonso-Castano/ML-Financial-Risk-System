@@ -79,9 +79,9 @@ class ComputedFeatures(BaseModel):
     debt_payment: float
     credit_score: float
     debt_ratio: float
-    liquidity_ratio: float
+    expense_volatility: float
     net_cash_flow: float
-    consec_negative_months: float
+    savings_trend: float
 
 
 class InsightsObject(BaseModel):
