@@ -18,9 +18,9 @@ const FEATURE_LABELS = {
   avg_income:             'Avg Monthly Income',
   avg_expenses:           'Avg Monthly Expenses',
   final_savings:          'Final Savings',
-  debt_payment:           'Monthly Debt Payment',
+  expense_ratio:          'Expense Ratio',
   credit_score:           'Credit Score',
-  debt_ratio:             'Debt Ratio',
+  savings_months:         'Savings Buffer (months)',
   expense_volatility:     'Expense Volatility',
   net_cash_flow:          'Net Cash Flow',
   savings_trend:          'Savings Trend ($/mo)',
@@ -63,9 +63,6 @@ function initDOMRefs() {
     gaugeLabel:         document.querySelector('.gauge-label'),
     riskCategory:       document.getElementById('riskCategory'),
     riskProbability:    document.getElementById('riskProbability'),
-
-    // Debt warning
-    debtWarning:        document.getElementById('debtWarning'),
 
     // Insights
     insightsSummary:    document.getElementById('insightsSummary'),
@@ -206,7 +203,6 @@ function getActiveRows() {
     const row = rows[i];
     const incomeInput   = row.querySelector('.income');
     const expensesInput = row.querySelector('.expenses');
-    const debtInput     = row.querySelector('.debt');
 
     const incomeRaw   = incomeInput   ? incomeInput.value.trim()   : '';
     const expensesRaw = expensesInput ? expensesInput.value.trim() : '';
@@ -228,7 +224,6 @@ function getActiveRows() {
       expenses:   expenses,
       incomeInput:  incomeInput,
       expensesInput: expensesInput,
-      debtInput:  debtInput,
       incomeEmpty,
       expensesEmpty,
     });
@@ -315,18 +310,6 @@ function validateForm() {
       valid = false;
     }
 
-    // Debt payment: optional, but if provided must be >= 0
-    if (r.debtInput) {
-      const debtRaw = r.debtInput.value.trim();
-      if (debtRaw !== '') {
-        const debt = parseFloat(debtRaw);
-        if (isNaN(debt) || debt < 0) {
-          markFieldError(r.debtInput, 'Must be 0 or greater');
-          errors.push('Debt payment must be non-negative (Month ' + r.month + ')');
-          valid = false;
-        }
-      }
-    }
   });
 
   // Credit score: required, 300-850
@@ -363,15 +346,9 @@ function validateForm() {
  */
 function buildPayload(activeRows, creditScore) {
   const months = activeRows.map(function (r) {
-    const debtRaw = r.debtInput ? r.debtInput.value.trim() : '';
-    const debt = (debtRaw !== '' && !isNaN(parseFloat(debtRaw)))
-      ? parseFloat(debtRaw)
-      : 0.0;  // Default to 0 when empty
-
     return {
-      income:       r.income,
-      expenses:     r.expenses,
-      debt_payment: debt,
+      income:   r.income,
+      expenses: r.expenses,
     };
   });
 
@@ -494,13 +471,6 @@ function renderResults(data) {
   const probPct = (data.probability * 100).toFixed(1) + '%';
   dom.riskProbability.textContent = probPct;
 
-  // Debt payment warning
-  if (data.debt_payment_defaulted) {
-    dom.debtWarning.classList.add('is-visible');
-  } else {
-    dom.debtWarning.classList.remove('is-visible');
-  }
-
   // Insights and features
   renderInsights(data.insights);
   renderFeatures(data.computed_features);
@@ -592,9 +562,12 @@ function formatFeatureValue(key, value) {
   if (value === null || value === undefined) return '—';
 
   switch (key) {
-    case 'debt_ratio':
+    case 'expense_ratio':
     case 'expense_volatility':
       return value.toFixed(2);
+
+    case 'savings_months':
+      return value.toFixed(1) + ' mo';
 
     case 'savings_trend':
       // Dollar per month — can be negative, so show sign
@@ -604,7 +577,7 @@ function formatFeatureValue(key, value) {
       return Math.round(value).toString();
 
     default:
-      // Dollar values: avg_income, avg_expenses, final_savings, debt_payment, net_cash_flow
+      // Dollar values: avg_income, avg_expenses, final_savings, net_cash_flow
       return '$' + Math.round(value).toLocaleString();
   }
 }
@@ -657,7 +630,7 @@ function initRetryBtn() {
 /**
  * Parse CSV text into an array of row objects.
  * Handles basic CSV (no quoted commas).
- * Expected columns: month, income, expenses, debt_payment, credit_score
+ * Expected columns: month, income, expenses, credit_score
  */
 function parseCSV(text) {
   const lines = text.split(/\r?\n/).filter(function (l) { return l.trim() !== ''; });
@@ -668,7 +641,6 @@ function parseCSV(text) {
   const monthIdx       = headers.indexOf('month');
   const incomeIdx      = headers.indexOf('income');
   const expensesIdx    = headers.indexOf('expenses');
-  const debtIdx        = headers.indexOf('debt_payment');
   const creditScoreIdx = headers.indexOf('credit_score');
 
   const months = [];
@@ -679,14 +651,12 @@ function parseCSV(text) {
 
     const income   = cols[incomeIdx]   !== undefined ? cols[incomeIdx]   : '';
     const expenses = cols[expensesIdx] !== undefined ? cols[expensesIdx] : '';
-    const debt     = cols[debtIdx]     !== undefined ? cols[debtIdx]     : '';
     const cs       = cols[creditScoreIdx] !== undefined ? cols[creditScoreIdx] : '';
 
     months.push({
       month:        monthIdx !== -1 ? (cols[monthIdx] || '') : String(i),
       income:       income,
       expenses:     expenses,
-      debt_payment: debt,
       credit_score: cs,
     });
 
@@ -719,11 +689,9 @@ function populateGridFromCSV(parsed) {
 
     const incomeInput   = row.querySelector('.income');
     const expensesInput = row.querySelector('.expenses');
-    const debtInput     = row.querySelector('.debt');
 
     if (incomeInput   && csvRow.income   !== '') incomeInput.value   = csvRow.income;
     if (expensesInput && csvRow.expenses !== '') expensesInput.value = csvRow.expenses;
-    if (debtInput     && csvRow.debt_payment !== '') debtInput.value = csvRow.debt_payment;
   });
 
   // Set credit score if found
@@ -757,11 +725,11 @@ function initCSVUpload() {
 
 function initDownloadTemplate() {
   dom.downloadTemplate.addEventListener('click', function () {
-    const headers = 'month,income,expenses,debt_payment,credit_score';
+    const headers = 'month,income,expenses,credit_score';
     const rows = [];
     for (let i = 1; i <= 12; i++) {
       // Only row 1 includes a credit_score placeholder; others leave it empty
-      rows.push(i + ',,,,');
+      rows.push(i + ',,,');
     }
     const csvContent = headers + '\n' + rows.join('\n');
 

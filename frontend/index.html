@@ -77,7 +77,6 @@
                 <th scope="col">Month</th>
                 <th scope="col">Income ($)</th>
                 <th scope="col">Expenses ($)</th>
-                <th scope="col">Debt Payment ($)</th>
               </tr>
             </thead>
             <tbody>
@@ -87,42 +86,36 @@
                 <td class="month-label">Month 1</td>
                 <td><input type="number" class="grid-input income" placeholder="4500" min="0" step="0.01" aria-label="Month 1 income"></td>
                 <td><input type="number" class="grid-input expenses" placeholder="3200" min="0" step="0.01" aria-label="Month 1 expenses"></td>
-                <td><input type="number" class="grid-input debt" placeholder="500" min="0" step="0.01" aria-label="Month 1 debt payment"></td>
               </tr>
               <tr data-month="2">
                 <td class="month-label">Month 2</td>
                 <td><input type="number" class="grid-input income" placeholder="4500" min="0" step="0.01" aria-label="Month 2 income"></td>
                 <td><input type="number" class="grid-input expenses" placeholder="3200" min="0" step="0.01" aria-label="Month 2 expenses"></td>
-                <td><input type="number" class="grid-input debt" placeholder="500" min="0" step="0.01" aria-label="Month 2 debt payment"></td>
               </tr>
               <tr data-month="3">
                 <td class="month-label">Month 3</td>
                 <td><input type="number" class="grid-input income" placeholder="4500" min="0" step="0.01" aria-label="Month 3 income"></td>
                 <td><input type="number" class="grid-input expenses" placeholder="3200" min="0" step="0.01" aria-label="Month 3 expenses"></td>
-                <td><input type="number" class="grid-input debt" placeholder="500" min="0" step="0.01" aria-label="Month 3 debt payment"></td>
               </tr>
               <tr data-month="4">
                 <td class="month-label">Month 4</td>
                 <td><input type="number" class="grid-input income" placeholder="4500" min="0" step="0.01" aria-label="Month 4 income"></td>
                 <td><input type="number" class="grid-input expenses" placeholder="3200" min="0" step="0.01" aria-label="Month 4 expenses"></td>
-                <td><input type="number" class="grid-input debt" placeholder="500" min="0" step="0.01" aria-label="Month 4 debt payment"></td>
               </tr>
               <tr data-month="5">
                 <td class="month-label">Month 5</td>
                 <td><input type="number" class="grid-input income" placeholder="4500" min="0" step="0.01" aria-label="Month 5 income"></td>
                 <td><input type="number" class="grid-input expenses" placeholder="3200" min="0" step="0.01" aria-label="Month 5 expenses"></td>
-                <td><input type="number" class="grid-input debt" placeholder="500" min="0" step="0.01" aria-label="Month 5 debt payment"></td>
               </tr>
               <tr data-month="6">
                 <td class="month-label">Month 6</td>
                 <td><input type="number" class="grid-input income" placeholder="4500" min="0" step="0.01" aria-label="Month 6 income"></td>
                 <td><input type="number" class="grid-input expenses" placeholder="3200" min="0" step="0.01" aria-label="Month 6 expenses"></td>
-                <td><input type="number" class="grid-input debt" placeholder="500" min="0" step="0.01" aria-label="Month 6 debt payment"></td>
               </tr>
 
               <!-- Visual separator before optional rows -->
               <tr class="optional-divider">
-                <td colspan="4">Optional — months 7 through 12</td>
+                <td colspan="3">Optional — months 7 through 12</td>
               </tr>
 
               <!-- Rows 7-12: optional months (visually dimmed) -->
@@ -130,37 +123,31 @@
                 <td class="month-label">Month 7</td>
                 <td><input type="number" class="grid-input income" placeholder="4500" min="0" step="0.01" aria-label="Month 7 income"></td>
                 <td><input type="number" class="grid-input expenses" placeholder="3200" min="0" step="0.01" aria-label="Month 7 expenses"></td>
-                <td><input type="number" class="grid-input debt" placeholder="500" min="0" step="0.01" aria-label="Month 7 debt payment"></td>
               </tr>
               <tr data-month="8" class="optional-row">
                 <td class="month-label">Month 8</td>
                 <td><input type="number" class="grid-input income" placeholder="4500" min="0" step="0.01" aria-label="Month 8 income"></td>
                 <td><input type="number" class="grid-input expenses" placeholder="3200" min="0" step="0.01" aria-label="Month 8 expenses"></td>
-                <td><input type="number" class="grid-input debt" placeholder="500" min="0" step="0.01" aria-label="Month 8 debt payment"></td>
               </tr>
               <tr data-month="9" class="optional-row">
                 <td class="month-label">Month 9</td>
                 <td><input type="number" class="grid-input income" placeholder="4500" min="0" step="0.01" aria-label="Month 9 income"></td>
                 <td><input type="number" class="grid-input expenses" placeholder="3200" min="0" step="0.01" aria-label="Month 9 expenses"></td>
-                <td><input type="number" class="grid-input debt" placeholder="500" min="0" step="0.01" aria-label="Month 9 debt payment"></td>
               </tr>
               <tr data-month="10" class="optional-row">
                 <td class="month-label">Month 10</td>
                 <td><input type="number" class="grid-input income" placeholder="4500" min="0" step="0.01" aria-label="Month 10 income"></td>
                 <td><input type="number" class="grid-input expenses" placeholder="3200" min="0" step="0.01" aria-label="Month 10 expenses"></td>
-                <td><input type="number" class="grid-input debt" placeholder="500" min="0" step="0.01" aria-label="Month 10 debt payment"></td>
               </tr>
               <tr data-month="11" class="optional-row">
                 <td class="month-label">Month 11</td>
                 <td><input type="number" class="grid-input income" placeholder="4500" min="0" step="0.01" aria-label="Month 11 income"></td>
                 <td><input type="number" class="grid-input expenses" placeholder="3200" min="0" step="0.01" aria-label="Month 11 expenses"></td>
-                <td><input type="number" class="grid-input debt" placeholder="500" min="0" step="0.01" aria-label="Month 11 debt payment"></td>
               </tr>
               <tr data-month="12" class="optional-row">
                 <td class="month-label">Month 12</td>
                 <td><input type="number" class="grid-input income" placeholder="4500" min="0" step="0.01" aria-label="Month 12 income"></td>
                 <td><input type="number" class="grid-input expenses" placeholder="3200" min="0" step="0.01" aria-label="Month 12 expenses"></td>
-                <td><input type="number" class="grid-input debt" placeholder="500" min="0" step="0.01" aria-label="Month 12 debt payment"></td>
               </tr>
 
             </tbody>
@@ -275,12 +262,6 @@
             <p class="risk-score-display">
               Probability: <strong id="riskProbability">—</strong>
             </p>
-          </div>
-
-          <!-- Debt payment defaulted note (hidden unless API flags it) -->
-          <div class="debt-warning" id="debtWarning" role="note">
-            <strong>Note:</strong> One or more months had no debt payment recorded.
-            If you carry debt, enter the monthly payment above for a more accurate prediction.
           </div>
 
           <!-- Insights -->
@@ -402,13 +383,13 @@ Dense(1)   + Sigmoid → probability 0–1</div>
         </p>
         <ul>
           <li><strong>avg_income</strong> — Average monthly income across all submitted months</li>
-          <li><strong>avg_expenses</strong> — Average monthly expenses across all submitted months</li>
+          <li><strong>avg_expenses</strong> — Average monthly expenses across all submitted months (including debt payments)</li>
           <li><strong>final_savings</strong> — Cumulative savings at the end of the window (floored at 0)</li>
-          <li><strong>debt_payment</strong> — Fixed monthly debt payment amount</li>
+          <li><strong>expense_ratio</strong> — Average expenses divided by average income. Values near 1.0 indicate spending at income level.</li>
           <li><strong>credit_score</strong> — Credit score (300–850)</li>
-          <li><strong>debt_ratio</strong> — Debt payment ÷ free cash flow (income − expenses)</li>
+          <li><strong>savings_months</strong> — Savings buffer measured in months of expenses. Higher = more resilient.</li>
           <li><strong>expense_volatility</strong> — Std dev ÷ mean of monthly expenses (coefficient of variation). Higher = more erratic spending.</li>
-          <li><strong>net_cash_flow</strong> — Average monthly income minus average monthly expenses</li>
+          <li><strong>net_cash_flow</strong> — Average monthly income minus average monthly expenses (debt is included in expenses)</li>
           <li><strong>savings_trend</strong> — Linear slope of cumulative savings over the window ($/month). Negative = declining savings.</li>
         </ul>
       </div>

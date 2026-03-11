@@ -768,28 +768,6 @@ body {
   font-weight: 700;
 }
 
-/* --------------------------------------------------------------------------
-   DEBT WARNING NOTE
-   -------------------------------------------------------------------------- */
-.debt-warning {
-  margin: var(--space-4) 0;
-  padding: var(--space-3) var(--space-4);
-  background: rgba(218, 119, 86, 0.08);
-  border: 1px solid rgba(218, 119, 86, 0.25);
-  border-radius: var(--radius-md);
-  font-size: var(--text-xs);
-  color: var(--color-text-muted);
-  line-height: 1.5;
-  display: none;
-}
-
-.debt-warning.is-visible {
-  display: block;
-}
-
-.debt-warning strong {
-  color: var(--color-text);
-}
 
 /* --------------------------------------------------------------------------
    INSIGHTS SECTION

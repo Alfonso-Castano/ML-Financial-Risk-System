@@ -128,17 +128,12 @@ class Predictor:
         # Step 7: Generate plain-language insights via threshold analysis
         insights = self._compute_insights(features, prob)
 
-        # Step 8: Flag if any month used the default 0.0 for debt_payment
-        # This catches both explicit zero submissions and omitted debt_payment fields
-        debt_payment_defaulted = any(m.debt_payment == 0.0 for m in request.months)
-
         return {
             "risk_score": risk_score,
             "risk_category": risk_category,
             "probability": round(prob, 4),
             "insights": insights,
             "computed_features": features,
-            "debt_payment_defaulted": debt_payment_defaulted,
         }
 
     def health(self) -> dict:
@@ -166,13 +161,25 @@ class Predictor:
         """
         Convert a PredictRequest into a DataFrame that engineer_features() accepts.
 
-        Column mapping (API field → training CSV column name):
-          month.income       → income          (same name)
-          month.expenses     → total_expenses  (CRITICAL: different name from API)
-          computed running   → savings         (cumulative, floored at 0)
-          month.debt_payment → debt_payment    (same name)
-          request.credit_score → credit_score  (broadcast to every row)
-          i + 1              → month           (1-indexed chronological index)
+        Column mapping (API field -> training CSV column name):
+          month.income       -> income          (same name)
+          month.expenses     -> total_expenses  (CRITICAL: different name from API)
+          computed running   -> savings         (cumulative, floored at 0)
+          request.credit_score -> credit_score  (broadcast to every row)
+          i + 1              -> month           (1-indexed chronological index)
+
+        Users report total expenses including debt payments. This matches training
+        data where total_expenses = essentials + discretionary + debt_payment.
+
+        Monthly variance injection:
+          Training data applies MONTHLY_VARIANCE (25%) noise to essentials (60% of
+          expenses) and discretionary (20%) independently, while debt_payment (20%)
+          stays fixed. This produces expense_volatility ~0.15 (CV of total_expenses).
+          API users typically send constant values, producing expense_volatility=0 —
+          a value the model has never seen (z-score = -4.55). To close this train/serve
+          skew, we inject calibrated noise (15% variance) that reproduces the training
+          distribution's effective CV. A fixed seed derived from the input ensures
+          deterministic predictions for the same request.
 
         The running savings is computed month-by-month and clamped at 0 to match
         the synthetic data generator's behavior (savings never go below zero).
@@ -185,19 +192,34 @@ class Predictor:
         Returns:
             pd.DataFrame with one row per month and the columns engineer_features expects.
         """
+        # Fixed seed from input for deterministic predictions
+        seed_value = int(abs(hash((
+            tuple((m.income, m.expenses) for m in request.months),
+            request.credit_score
+        )))) % (2**31)
+        rng = np.random.default_rng(seed_value)
+
         rows = []
         cumulative_savings = 0.0
 
         for i, month in enumerate(request.months):
-            monthly_net = month.income - month.expenses - month.debt_payment
+            # Inject calibrated monthly variance matching training data's effective CV.
+            # Training uses 25% noise on essentials (60%) and discretionary (20%)
+            # independently, keeping debt (20%) fixed — effective CV on total ~0.15.
+            # Using 0.15 variance here reproduces that distribution.
+            inference_variance = 0.15
+            income = month.income * rng.normal(1.0, inference_variance)
+            expenses = month.expenses * rng.normal(1.0, inference_variance)
+
+            # Expenses already include debt — no separate subtraction
+            monthly_net = income - expenses
             cumulative_savings = max(0.0, cumulative_savings + monthly_net)
 
             rows.append({
                 'month': i + 1,
-                'income': month.income,
-                'total_expenses': month.expenses,   # API: expenses → training: total_expenses
-                'savings': cumulative_savings,
-                'debt_payment': month.debt_payment,
+                'income': round(income, 2),
+                'total_expenses': round(expenses, 2),
+                'savings': round(cumulative_savings, 2),
                 'credit_score': request.credit_score,
             })
 
@@ -238,12 +260,20 @@ class Predictor:
                 f"${monthly_decline}/month on average"
             )
 
-        # --- Debt ratio: consuming the majority of free cash flow ---
-        if features['debt_ratio'] > 0.5:
-            pct = round(features['debt_ratio'] * 100)
+        # --- Expense ratio: spending at or above income level ---
+        if features['expense_ratio'] > 0.90:
+            pct = round(features['expense_ratio'] * 100)
             risk_factors.append(
-                f"High debt burden: debt payments consume {pct}% of available cash flow "
-                f"after expenses"
+                f"High spending pressure: expenses consume {pct}% of income "
+                f"(values near or above 100% indicate financial strain)"
+            )
+
+        # --- Savings buffer: less than 1 month of expenses saved ---
+        if features['savings_months'] < 1.0:
+            months_str = round(features['savings_months'], 1)
+            risk_factors.append(
+                f"Thin savings buffer: savings cover only {months_str} months of expenses "
+                f"(below the 1-month minimum recommended buffer)"
             )
 
         # --- Net cash flow: structural deficit when average is negative ---

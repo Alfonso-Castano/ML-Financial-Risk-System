@@ -17,24 +17,19 @@ from pydantic import BaseModel, field_validator, model_validator
 # ---------------------------------------------------------------------------
 
 class MonthlyEntry(BaseModel):
-    """One month of financial data submitted by the user."""
+    """One month of financial data submitted by the user.
+
+    Users should report total expenses including debt payments.
+    """
 
     income: float
     expenses: float
-    debt_payment: float = 0.0  # Optional — defaults to 0 when not provided
 
     @field_validator('income', 'expenses')
     @classmethod
     def income_expenses_must_be_non_negative(cls, v: float, info) -> float:
         if v < 0:
             raise ValueError(f"{info.field_name} must be non-negative")
-        return v
-
-    @field_validator('debt_payment')
-    @classmethod
-    def debt_payment_must_be_non_negative(cls, v: float) -> float:
-        if v < 0:
-            raise ValueError("debt_payment must be non-negative")
         return v
 
 
@@ -76,9 +71,9 @@ class ComputedFeatures(BaseModel):
     avg_income: float
     avg_expenses: float
     final_savings: float
-    debt_payment: float
+    expense_ratio: float
     credit_score: float
-    debt_ratio: float
+    savings_months: float
     expense_volatility: float
     net_cash_flow: float
     savings_trend: float
@@ -99,7 +94,6 @@ class PredictResponse(BaseModel):
     probability: float          # Raw model output in [0, 1]
     insights: InsightsObject
     computed_features: ComputedFeatures
-    debt_payment_defaulted: bool  # True if any month used the default 0.0 debt_payment
 
 
 class HealthResponse(BaseModel):

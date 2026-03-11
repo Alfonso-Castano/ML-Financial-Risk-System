@@ -8,11 +8,11 @@ Feature set (in order):
     avg_income            - Mean monthly income over 12 months
     avg_expenses          - Mean total monthly expenses over 12 months
     final_savings         - Savings balance at month 12
-    debt_payment          - Fixed monthly debt payment (constant per profile)
+    expense_ratio         - Average expenses divided by average income
     credit_score          - Credit score (constant per profile)
-    debt_ratio            - Debt payment relative to free cash flow
+    savings_months        - Final savings divided by average expenses (buffer in months)
     expense_volatility    - Coefficient of variation of monthly expenses (std/mean)
-    net_cash_flow         - Income minus expenses minus debt payment
+    net_cash_flow         - Income minus expenses (debt included in expenses)
     savings_trend         - Linear slope of cumulative savings ($/month)
 """
 
@@ -26,41 +26,61 @@ FEATURE_NAMES: List[str] = [
     'avg_income',
     'avg_expenses',
     'final_savings',
-    'debt_payment',
+    'expense_ratio',
     'credit_score',
-    'debt_ratio',
+    'savings_months',
     'expense_volatility',
     'net_cash_flow',
     'savings_trend',
 ]
 
 
-def compute_debt_ratio(
+def compute_expense_ratio(
     avg_monthly_income: float,
     avg_monthly_expenses: float,
-    monthly_debt_payment: float,
 ) -> float:
     """
-    Compute debt ratio as debt payment relative to free cash flow.
+    Compute the ratio of average expenses to average income.
 
-    Formula: monthly_debt_payment / (avg_monthly_income - avg_monthly_expenses)
+    Formula: avg_monthly_expenses / avg_monthly_income
 
-    A high ratio means most of the surplus after expenses is consumed by debt.
-    Returns 0.0 when free cash flow is zero or negative to avoid inf/NaN values
-    that would break gradient computation during training.
+    Values near or above 1.0 indicate spending at or beyond income level.
+    Returns 0.0 when income is zero or negative to avoid division errors.
 
     Args:
         avg_monthly_income: Mean monthly income over the observation period.
         avg_monthly_expenses: Mean total monthly expenses over the observation period.
-        monthly_debt_payment: Fixed monthly debt payment amount.
 
     Returns:
-        Debt ratio as a float, or 0.0 if free cash flow is non-positive.
+        Expense ratio as a float, or 0.0 if income is non-positive.
     """
-    free_cash_flow = avg_monthly_income - avg_monthly_expenses
-    if free_cash_flow <= 0:
+    if avg_monthly_income <= 0:
         return 0.0
-    return monthly_debt_payment / free_cash_flow
+    return avg_monthly_expenses / avg_monthly_income
+
+
+def compute_savings_months(
+    final_savings: float,
+    avg_monthly_expenses: float,
+) -> float:
+    """
+    Compute savings buffer as months of expenses covered.
+
+    Formula: final_savings / avg_monthly_expenses
+
+    Directly interpretable: 3.0 means savings cover 3 months of expenses.
+    Returns 0.0 when expenses are zero or negative.
+
+    Args:
+        final_savings: Savings balance at the end of the observation window.
+        avg_monthly_expenses: Mean total monthly expenses over the observation period.
+
+    Returns:
+        Savings buffer in months, or 0.0 if expenses are non-positive.
+    """
+    if avg_monthly_expenses <= 0:
+        return 0.0
+    return final_savings / avg_monthly_expenses
 
 
 def compute_expense_volatility(monthly_expenses: List[float]) -> float:
@@ -110,25 +130,24 @@ def compute_savings_trend(cumulative_savings: List[float]) -> float:
 def compute_net_cash_flow(
     avg_monthly_income: float,
     avg_monthly_expenses: float,
-    monthly_debt_payment: float,
 ) -> float:
     """
-    Compute net monthly cash flow after expenses and debt obligations.
+    Compute net monthly cash flow after expenses.
 
-    Formula: avg_monthly_income - avg_monthly_expenses - monthly_debt_payment
+    Formula: avg_monthly_income - avg_monthly_expenses
 
-    Represents average disposable income after all obligations. Negative values
-    are valid and informative — they signal structural cash-flow deficits.
+    Debt payments are already included in total_expenses (the synthetic generator
+    adds debt_payment into total_expenses at generation time), so subtracting
+    debt separately would double-count it.
 
     Args:
         avg_monthly_income: Mean monthly income over the observation period.
         avg_monthly_expenses: Mean total monthly expenses over the observation period.
-        monthly_debt_payment: Fixed monthly debt payment amount.
 
     Returns:
         Net cash flow as a float. May be negative.
     """
-    return avg_monthly_income - avg_monthly_expenses - monthly_debt_payment
+    return avg_monthly_income - avg_monthly_expenses
 
 
 def compute_cash_flow_volatility(monthly_cash_flows: List[float]) -> float:
@@ -160,7 +179,7 @@ def engineer_features(profile_df: pd.DataFrame) -> Dict[str, float]:
     Args:
         profile_df: DataFrame slice containing exactly the rows for one profile_id.
                     Expected columns: month, income, total_expenses, savings,
-                    debt_payment, credit_score.
+                    credit_score.
 
     Returns:
         Dict with exactly 9 keys matching FEATURE_NAMES, all values as float.
@@ -171,7 +190,6 @@ def engineer_features(profile_df: pd.DataFrame) -> Dict[str, float]:
     avg_income = float(group['income'].mean())
     avg_expenses = float(group['total_expenses'].mean())
     final_savings = float(group.iloc[-1]['savings'])   # month 12 after sorting
-    debt_payment = float(group.iloc[0]['debt_payment'])  # fixed per profile
     credit_score = float(group.iloc[0]['credit_score'])  # fixed per profile
 
     # Per-month series for volatility and trend features
@@ -179,18 +197,19 @@ def engineer_features(profile_df: pd.DataFrame) -> Dict[str, float]:
     savings_series = group['savings'].tolist()
 
     # Derived features
-    debt_ratio = compute_debt_ratio(avg_income, avg_expenses, debt_payment)
+    expense_ratio = compute_expense_ratio(avg_income, avg_expenses)
+    savings_months = compute_savings_months(final_savings, avg_expenses)
     expense_volatility = compute_expense_volatility(monthly_expenses)
-    net_cash_flow = compute_net_cash_flow(avg_income, avg_expenses, debt_payment)
+    net_cash_flow = compute_net_cash_flow(avg_income, avg_expenses)
     savings_trend = compute_savings_trend(savings_series)
 
     return {
         'avg_income': avg_income,
         'avg_expenses': avg_expenses,
         'final_savings': final_savings,
-        'debt_payment': debt_payment,
+        'expense_ratio': expense_ratio,
         'credit_score': credit_score,
-        'debt_ratio': debt_ratio,
+        'savings_months': savings_months,
         'expense_volatility': expense_volatility,
         'net_cash_flow': net_cash_flow,
         'savings_trend': savings_trend,
