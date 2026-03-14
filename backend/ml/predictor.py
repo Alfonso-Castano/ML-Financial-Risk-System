@@ -104,8 +104,20 @@ class Predictor:
 
         # Step 3: Assemble feature vector in canonical FEATURE_NAMES order
         # IMPORTANT: must use FEATURE_NAMES order — the scaler was fit in this order
+        #
+        # Clamp expense_volatility for model input: constant monthly values produce
+        # expense_volatility=0 (OOD, z=-4.55). Since expense_volatility has near-zero
+        # permutation importance (-0.0012), we substitute the training mean (0.1497)
+        # so the model sees z≈0 (neutral). The honest value stays in `features` dict
+        # for display to the user.
+        EXPENSE_VOL_TRAIN_MEAN = 0.1497
+        model_features = {
+            name: (EXPENSE_VOL_TRAIN_MEAN if name == 'expense_volatility'
+                   and features[name] < 0.01 else features[name])
+            for name in FEATURE_NAMES
+        }
         feature_vector = np.array(
-            [features[name] for name in FEATURE_NAMES],
+            [model_features[name] for name in FEATURE_NAMES],
             dtype=np.float32
         )
 
@@ -171,20 +183,17 @@ class Predictor:
         Users report total expenses including debt payments. This matches training
         data where total_expenses = essentials + discretionary + debt_payment.
 
-        Monthly variance injection:
-          Training data applies MONTHLY_VARIANCE (25%) noise to essentials (60% of
-          expenses) and discretionary (20%) independently, while debt_payment (20%)
-          stays fixed. This produces expense_volatility ~0.15 (CV of total_expenses).
-          API users typically send constant values, producing expense_volatility=0 —
-          a value the model has never seen (z-score = -4.55). To close this train/serve
-          skew, we inject calibrated noise (15% variance) that reproduces the training
-          distribution's effective CV. A fixed seed derived from the input ensures
-          deterministic predictions for the same request.
-
         The running savings is computed month-by-month and clamped at 0 to match
         the synthetic data generator's behavior (savings never go below zero).
         Starting balance is assumed to be 0 — this represents net savings
         accumulated during the observation period.
+
+        Note on expense_volatility: API users sending constant monthly values will
+        produce expense_volatility=0, which is OOD (training mean ~0.15). Rather
+        than injecting noise here (which corrupts computed features shown to the
+        user), we handle this in predict() by clamping the model input for
+        expense_volatility to the training mean. This keeps displayed features
+        honest while giving the model a reasonable input.
 
         Args:
             request: PredictRequest with validated months and credit_score.
@@ -192,33 +201,17 @@ class Predictor:
         Returns:
             pd.DataFrame with one row per month and the columns engineer_features expects.
         """
-        # Fixed seed from input for deterministic predictions
-        seed_value = int(abs(hash((
-            tuple((m.income, m.expenses) for m in request.months),
-            request.credit_score
-        )))) % (2**31)
-        rng = np.random.default_rng(seed_value)
-
         rows = []
         cumulative_savings = 0.0
 
         for i, month in enumerate(request.months):
-            # Inject calibrated monthly variance matching training data's effective CV.
-            # Training uses 25% noise on essentials (60%) and discretionary (20%)
-            # independently, keeping debt (20%) fixed — effective CV on total ~0.15.
-            # Using 0.15 variance here reproduces that distribution.
-            inference_variance = 0.15
-            income = month.income * rng.normal(1.0, inference_variance)
-            expenses = month.expenses * rng.normal(1.0, inference_variance)
-
-            # Expenses already include debt — no separate subtraction
-            monthly_net = income - expenses
+            monthly_net = month.income - month.expenses
             cumulative_savings = max(0.0, cumulative_savings + monthly_net)
 
             rows.append({
                 'month': i + 1,
-                'income': round(income, 2),
-                'total_expenses': round(expenses, 2),
+                'income': round(month.income, 2),
+                'total_expenses': round(month.expenses, 2),
                 'savings': round(cumulative_savings, 2),
                 'credit_score': request.credit_score,
             })
